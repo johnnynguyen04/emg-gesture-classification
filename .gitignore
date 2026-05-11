@@ -26,3 +26,6 @@ results/pipeline_run.log
 .DS_Store
 .vscode/
 .idea/
+
+# uipro skill data (cloned tooling, not project source)
+.uipro/
