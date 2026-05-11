@@ -1,8 +1,10 @@
 """Streamlit demo: predict a hand gesture from a 200 ms × 10ch sEMG window."""
 from __future__ import annotations
 
+import base64
 import io
 import json
+import math
 import re
 import sys
 from pathlib import Path
@@ -28,7 +30,45 @@ CNN_METRICS = ROOT / "results" / "metrics" / "cnn_metrics.json"
 RF_CONFUSION = ROOT / "results" / "figures" / "rf_confusion.png"
 CNN_CONFUSION = ROOT / "results" / "figures" / "cnn_confusion.png"
 SAMPLES_DIR = ROOT / "streamlit_app" / "samples"
+ASSETS_DIR = ROOT / "streamlit_app" / "assets"
 GITHUB_URL = "https://github.com/johnnynguyen04/emg-gesture-classification"
+
+
+@st.cache_resource
+def portrait_data_url() -> str | None:
+    if not ASSETS_DIR.exists():
+        return None
+    for ext in (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG"):
+        p = ASSETS_DIR / f"portrait{ext}"
+        if p.exists():
+            mime = "image/png" if p.suffix.lower() == ".png" else "image/jpeg"
+            data = base64.b64encode(p.read_bytes()).decode()
+            return f"data:{mime};base64,{data}"
+    return None
+
+
+@st.cache_resource
+def emg_wave_path() -> str:
+    """Tileable EMG-style path: two identical halves so translateX -50% loops seamlessly."""
+    seg_w = 1200
+    baseline = 100
+    bursts = [(0.14, 0.06, 32), (0.42, 0.05, 44), (0.71, 0.07, 26)]
+    seg = []
+    for x in range(0, seg_w, 4):
+        t = x / seg_w
+        y = baseline + 2.2 * math.sin(t * math.pi * 4)
+        for center, w, intensity in bursts:
+            if abs(t - center) < w:
+                env = math.cos((t - center) / w * math.pi / 2) ** 2
+                spike = (math.sin(x * 0.55 + center * 90) * intensity
+                         + math.sin(x * 1.05) * intensity * 0.45
+                         + math.sin(x * 0.27) * intensity * 0.25)
+                y += spike * env
+        seg.append((x, y))
+    points = list(seg) + [(x + seg_w, y) for x, y in seg]
+    return " ".join(
+        f"{'M' if i == 0 else 'L'}{x},{y:.1f}" for i, (x, y) in enumerate(points)
+    )
 
 PRIMARY = "#1FA5DB"
 PRIMARY_DARK = "#1B365D"
@@ -90,17 +130,22 @@ def inject_css() -> None:
             color: {TEXT_BODY};
             position: relative;
         }}
-        /*-style flowing background: two soft sky-blue ribbons */
-        .stApp::before {{
-            content: "";
+        /* Animated EMG-style line wave through the middle of the page */
+        .emg-bg {{
             position: fixed;
-            inset: 0;
+            top: 50%;
+            left: 0;
+            width: 200%;
+            height: 240px;
+            transform: translate3d(0, -50%, 0);
             pointer-events: none;
             z-index: 0;
-            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 900' preserveAspectRatio='xMidYMid slice'><path d='M0,0 L1440,0 L1440,260 C1240,320 1080,240 880,290 C680,340 460,260 220,310 C120,330 50,310 0,320 Z' fill='%231FA5DB' opacity='0.07'/><path d='M0,300 C160,340 360,290 540,330 C720,370 900,310 1080,360 C1260,400 1380,360 1440,380 L1440,260 C1240,320 1080,240 880,290 C680,340 460,260 220,310 C120,330 50,310 0,320 Z' fill='%231FA5DB' opacity='0.04'/><path d='M1440,900 L0,900 L0,720 C200,680 360,740 540,700 C720,660 900,720 1080,690 C1260,660 1380,690 1440,680 Z' fill='%237BC043' opacity='0.04'/></svg>");
-            background-size: cover;
-            background-position: center top;
-            background-repeat: no-repeat;
+            animation: emgFlow 55s linear infinite;
+        }}
+        .emg-bg svg {{ width: 100%; height: 100%; display: block; }}
+        @keyframes emgFlow {{
+            0% {{ transform: translate3d(0, -50%, 0); }}
+            100% {{ transform: translate3d(-50%, -50%, 0); }}
         }}
         .stApp > * {{ position: relative; z-index: 1; }}
         .stApp h1, .stApp h2, .stApp h3, .stApp h4 {{
@@ -229,6 +274,17 @@ def inject_css() -> None:
         @keyframes avatarPulse {{
             0%, 100% {{ box-shadow: 0 4px 14px rgba(31, 165, 219, 0.20); }}
             50% {{ box-shadow: 0 6px 22px rgba(31, 165, 219, 0.42); }}
+        }}
+        img.avatar-photo {{
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 0.85rem;
+            box-shadow: 0 4px 14px rgba(31, 165, 219, 0.25);
+            animation: avatarPulse 4s ease-in-out infinite;
+            display: inline-block;
+            border: 3px solid {CARD};
         }}
         .footer-name {{
             font-family: 'Manrope', sans-serif;
@@ -846,10 +902,15 @@ def render_why() -> None:
 
 
 def render_footer() -> None:
+    portrait = portrait_data_url()
+    avatar = (
+        f'<img class="avatar-photo" src="{portrait}" alt="Johnny Nguyen" />'
+        if portrait else '<div class="avatar">JN</div>'
+    )
     st.markdown(
         f"""
         <div class="footer-card">
-            <div class="avatar">JN</div>
+            {avatar}
             <div class="footer-name">Johnny Nguyen</div>
             <div class="footer-bio">UCF Data Science</div>
             <div class="footer-links">
@@ -858,6 +919,23 @@ def render_footer() -> None:
                 <a href="mailto:johnny060904@gmail.com">Email</a>
             </div>
             <div class="copyright">© 2026 Johnny Nguyen · EMG gesture classifier</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_emg_background() -> None:
+    st.markdown(
+        f"""
+        <div class="emg-bg" aria-hidden="true">
+            <svg viewBox="0 0 2400 200" preserveAspectRatio="none"
+                 xmlns="http://www.w3.org/2000/svg">
+                <path d="{emg_wave_path()}"
+                      stroke="{PRIMARY}" stroke-width="1.6"
+                      fill="none" stroke-linecap="round"
+                      opacity="0.22"/>
+            </svg>
         </div>
         """,
         unsafe_allow_html=True,
@@ -881,6 +959,7 @@ def main() -> None:
         )
         st.stop()
 
+    render_emg_background()
     render_hero()
     render_stats(comparison)
     st.markdown("&nbsp;", unsafe_allow_html=True)
