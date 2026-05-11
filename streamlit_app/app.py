@@ -418,35 +418,48 @@ def inject_css() -> None:
            between samples doesn't snap-cut. No animation-fill-mode set,
            so default opacity is 1 if animation never fires. */
         @keyframes smoothFade {{
-            from {{ opacity: 0; transform: translateY(3px); }}
+            from {{ opacity: 0; transform: translateY(8px); }}
             to {{ opacity: 1; transform: translateY(0); }}
         }}
+        [data-testid="stPyplotChart"],
         [data-testid="stPyplotChart"] img,
+        [data-testid="stImage"],
         [data-testid="stImage"] img {{
-            animation: smoothFade 0.42s ease-out;
+            animation: smoothFade 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }}
         .pred-reveal {{
-            animation: smoothFade 0.32s ease-out;
+            animation: smoothFade 0.42s cubic-bezier(0.16, 1, 0.3, 1);
         }}
 
-        /* Live pulse dot — signals the demo is interactive */
-        .live-dot {{
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: {ACCENT};
-            margin-right: 0.55rem;
-            vertical-align: middle;
-            position: relative;
-            top: -2px;
-            box-shadow: 0 0 0 0 rgba(95, 162, 56, 0.65);
-            animation: livePulse 2.1s ease-out infinite;
+        /* Entry animations — safe pattern: animation-fill-mode: backwards
+           means elements default to visible if animation fails, only invisible
+           during the delay (which is brief). No catch-all selectors. */
+        @keyframes riseIn {{
+            from {{ opacity: 0; transform: translateY(16px); }}
+            to {{ opacity: 1; transform: translateY(0); }}
         }}
-        @keyframes livePulse {{
-            0% {{ box-shadow: 0 0 0 0 rgba(95, 162, 56, 0.65); }}
-            70% {{ box-shadow: 0 0 0 10px rgba(95, 162, 56, 0); }}
-            100% {{ box-shadow: 0 0 0 0 rgba(95, 162, 56, 0); }}
+        .hero-card {{
+            animation: riseIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+        }}
+        [data-testid="stMetric"] {{
+            animation: riseIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+        }}
+        [data-testid="stMetric"]:nth-of-type(1) {{ animation-delay: 80ms; }}
+        [data-testid="stMetric"]:nth-of-type(2) {{ animation-delay: 130ms; }}
+        [data-testid="stMetric"]:nth-of-type(3) {{ animation-delay: 180ms; }}
+        [data-testid="stMetric"]:nth-of-type(4) {{ animation-delay: 230ms; }}
+        [data-testid="stMetric"]:nth-of-type(5) {{ animation-delay: 280ms; }}
+        [data-testid="stMetric"]:nth-of-type(6) {{ animation-delay: 330ms; }}
+        .method-card {{
+            animation: riseIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+        }}
+        .method-card:nth-of-type(1) {{ animation-delay: 60ms; }}
+        .method-card:nth-of-type(2) {{ animation-delay: 120ms; }}
+        .method-card:nth-of-type(3) {{ animation-delay: 180ms; }}
+        .method-card:nth-of-type(4) {{ animation-delay: 240ms; }}
+        .footer-card {{
+            animation: riseIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+            animation-delay: 100ms;
         }}
 
         /* Card hover lift */
@@ -579,7 +592,7 @@ def render_stats(comparison: dict) -> None:
 
 
 def render_demo(model, stats, labels) -> None:
-    st.markdown('<h3 style="margin-top:0.25rem;"><span class="live-dot"></span>Live Classification</h3>', unsafe_allow_html=True)
+    st.markdown("### Live Classification")
     samples = sorted(SAMPLES_DIR.glob("*.npy")) if SAMPLES_DIR.exists() else []
 
     source = st.radio(
