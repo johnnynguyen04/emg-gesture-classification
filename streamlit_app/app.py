@@ -88,7 +88,21 @@ def inject_css() -> None:
             background: {BG};
             font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
             color: {TEXT_BODY};
+            position: relative;
         }}
+        /*-style flowing background: two soft sky-blue ribbons */
+        .stApp::before {{
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 900' preserveAspectRatio='xMidYMid slice'><path d='M0,0 L1440,0 L1440,260 C1240,320 1080,240 880,290 C680,340 460,260 220,310 C120,330 50,310 0,320 Z' fill='%231FA5DB' opacity='0.07'/><path d='M0,300 C160,340 360,290 540,330 C720,370 900,310 1080,360 C1260,400 1380,360 1440,380 L1440,260 C1240,320 1080,240 880,290 C680,340 460,260 220,310 C120,330 50,310 0,320 Z' fill='%231FA5DB' opacity='0.04'/><path d='M1440,900 L0,900 L0,720 C200,680 360,740 540,700 C720,660 900,720 1080,690 C1260,660 1380,690 1440,680 Z' fill='%237BC043' opacity='0.04'/></svg>");
+            background-size: cover;
+            background-position: center top;
+            background-repeat: no-repeat;
+        }}
+        .stApp > * {{ position: relative; z-index: 1; }}
         .stApp h1, .stApp h2, .stApp h3, .stApp h4 {{
             font-family: 'Manrope', sans-serif;
             font-weight: 700;
@@ -504,8 +518,8 @@ def render_hero() -> None:
     st.markdown(
         f"""
         <div class="hero-card">
-            <div class="hero-chip">Machine learning · Biosignals</div>
-            <h1 style="margin: 0 0 0.55rem 0;">EMG hand gesture classifier</h1>
+            <div class="hero-chip">Machine Learning · Biosignals</div>
+            <h1 style="margin: 0 0 0.55rem 0;">EMG Hand Gesture Classifier</h1>
             <div class="byline">by Johnny Nguyen · UCF Data Science</div>
         </div>
         """,
@@ -531,7 +545,7 @@ def render_stats(comparison: dict) -> None:
 
 
 def render_demo(model, stats, labels) -> None:
-    st.markdown("### Live classification")
+    st.markdown("### Live Classification")
     samples = sorted(SAMPLES_DIR.glob("*.npy")) if SAMPLES_DIR.exists() else []
 
     source = st.radio(
@@ -625,7 +639,7 @@ def render_demo(model, stats, labels) -> None:
                 )
 
     st.markdown("&nbsp;", unsafe_allow_html=True)
-    st.markdown("### Top 5 predictions")
+    st.markdown("### Top 5 Predictions")
     correct_pos = None
     if true_id is not None and true_id in top_idx.tolist():
         correct_pos = top_idx.tolist().index(true_id)
@@ -655,7 +669,7 @@ def plot_per_class(rows: list[dict], color: str) -> plt.Figure:
 
 
 def render_model_comparison(comparison: dict) -> None:
-    st.markdown("### Model comparison")
+    st.markdown("### Model Comparison")
     st.markdown(
         '<div class="section-note">Random Forest on Hudgins time-domain '
         "features against a 1D CNN trained end to end on the same windows. "
@@ -721,7 +735,7 @@ def render_per_class(labels: dict) -> None:
     bottom = rows[:10]
     top = rows[-10:][::-1]
 
-    st.markdown("### Per-class performance")
+    st.markdown("### Per-Class Performance")
     st.markdown(
         '<div class="section-note">CNN F1 score per gesture on the held-out '
         "test set. Hardest classes cluster in functional grasps where "
