@@ -174,6 +174,58 @@ def inject_css() -> None:
             padding: 0.5rem 0 1.5rem 0;
             margin-bottom: 1rem;
         }}
+        /* Apple-style liquid glass button (backdrop-blur + layered inset shadows).
+           No SVG displacement — Chrome would show refraction, all browsers
+           get clean frosted glass. */
+        .glass-btn {{
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.6rem 1.3rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(14px) saturate(170%);
+            -webkit-backdrop-filter: blur(14px) saturate(170%);
+            color: {PRIMARY_DARK};
+            font-weight: 600;
+            font-size: 0.9rem;
+            font-family: 'Manrope', sans-serif;
+            letter-spacing: -0.005em;
+            text-decoration: none;
+            transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1),
+                        box-shadow 280ms cubic-bezier(0.16, 1, 0.3, 1),
+                        background 280ms ease;
+            box-shadow:
+                inset 0 0 0 1px rgba(255, 255, 255, 0.45),
+                inset 1.5px 2.5px 0 -2px rgba(255, 255, 255, 0.85),
+                inset -2px -2px 0 -2px rgba(255, 255, 255, 0.7),
+                inset -0.5px -1px 3px 0 rgba(0, 0, 0, 0.10),
+                inset 0 2.5px 3.5px -2px rgba(0, 0, 0, 0.16),
+                0 1px 4px 0 rgba(27, 54, 93, 0.08),
+                0 5px 14px -2px rgba(27, 54, 93, 0.10);
+            cursor: pointer;
+        }}
+        .glass-btn:hover {{
+            transform: scale(1.04);
+            background: rgba(255, 255, 255, 0.7);
+            box-shadow:
+                inset 0 0 0 1px rgba(255, 255, 255, 0.55),
+                inset 1.5px 2.5px 0 -2px rgba(255, 255, 255, 0.95),
+                inset -2px -2px 0 -2px rgba(255, 255, 255, 0.85),
+                0 4px 16px -2px rgba(27, 54, 93, 0.18);
+        }}
+        .glass-btn:active {{ transform: scale(0.97); }}
+        .glass-btn-sm {{
+            padding: 0.4rem 0.95rem;
+            font-size: 0.82rem;
+        }}
+        .glass-btn .arrow {{
+            font-size: 1rem;
+            line-height: 1;
+            transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+        }}
+        .glass-btn:hover .arrow {{ transform: translateX(2px); }}
+
         .hero-chip {{
             display: inline-block;
             font-family: 'Manrope', sans-serif;
@@ -560,7 +612,10 @@ def render_hero() -> None:
         <div class="hero-block">
             <div class="hero-chip">Machine Learning · Biosignals</div>
             <h1 style="margin: 0 0 0.55rem 0;">EMG Hand Gesture Classifier</h1>
-            <div class="byline">by Johnny Nguyen · UCF Data Science</div>
+            <div class="byline" style="margin-bottom: 1.1rem;">by Johnny Nguyen · UCF Data Science</div>
+            <a href="{GITHUB_URL}" target="_blank" class="glass-btn">
+                View Source <span class="arrow">→</span>
+            </a>
         </div>
         """,
         unsafe_allow_html=True,
