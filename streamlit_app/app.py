@@ -105,7 +105,6 @@ def inject_css() -> None:
             background: {BG};
             font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
             color: {TEXT_BODY};
-            position: relative;
         }}
         .stApp h1, .stApp h2, .stApp h3, .stApp h4 {{
             font-family: 'Manrope', sans-serif;
@@ -410,25 +409,6 @@ def inject_css() -> None:
 
         /* Streamlit alerts */
         [data-testid="stAlert"] {{ border-radius: 10px; }}
-
-        /* Entry animation: staggered fade-up on first paint */
-        @keyframes fadeUp {{
-            from {{ opacity: 0; transform: translateY(6px); }}
-            to {{ opacity: 1; transform: translateY(0); }}
-        }}
-        .stApp .element-container {{
-            animation: fadeUp 0.45s ease-out both;
-        }}
-        .stApp .element-container:nth-child(1) {{ animation-delay: 0ms; }}
-        .stApp .element-container:nth-child(2) {{ animation-delay: 60ms; }}
-        .stApp .element-container:nth-child(3) {{ animation-delay: 120ms; }}
-        .stApp .element-container:nth-child(4) {{ animation-delay: 180ms; }}
-        .stApp .element-container:nth-child(5) {{ animation-delay: 240ms; }}
-        .stApp .element-container:nth-child(6) {{ animation-delay: 300ms; }}
-        .stApp .element-container:nth-child(7) {{ animation-delay: 360ms; }}
-        .stApp .element-container:nth-child(8) {{ animation-delay: 420ms; }}
-        .stApp .element-container:nth-child(9) {{ animation-delay: 480ms; }}
-        .stApp .element-container:nth-child(10) {{ animation-delay: 520ms; }}
 
         /* Card hover lift */
         [data-testid="stMetric"] {{
