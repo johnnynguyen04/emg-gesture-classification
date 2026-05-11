@@ -23,6 +23,10 @@ CHECKPOINT = ROOT / "results" / "metrics" / "cnn_best.pt"
 NORM_STATS = ROOT / "results" / "metrics" / "norm_stats.npz"
 LABEL_MAP = ROOT / "results" / "metrics" / "label_map.json"
 COMPARISON = ROOT / "results" / "metrics" / "comparison.json"
+RF_METRICS = ROOT / "results" / "metrics" / "rf_metrics.json"
+CNN_METRICS = ROOT / "results" / "metrics" / "cnn_metrics.json"
+RF_CONFUSION = ROOT / "results" / "figures" / "rf_confusion.png"
+CNN_CONFUSION = ROOT / "results" / "figures" / "cnn_confusion.png"
 SAMPLES_DIR = ROOT / "streamlit_app" / "samples"
 GITHUB_URL = "https://github.com/johnnynguyen04/emg-gesture-classification"
 
@@ -173,6 +177,47 @@ def inject_css() -> None:
         .copyright {{ color: {MUTED}; font-size: 0.78rem; margin-top: 1rem; }}
         section[data-testid="stSidebar"] {{ display: none; }}
         .block-container {{ max-width: 760px; padding-top: 2rem; }}
+
+        .method-card {{
+            background: {CARD};
+            border: 1px solid {BORDER};
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            height: 100%;
+            transition: box-shadow 0.18s ease, transform 0.18s ease;
+        }}
+        .method-card:hover {{
+            box-shadow: 0 4px 14px rgba(14, 127, 184, 0.08);
+            transform: translateY(-1px);
+        }}
+        .method-title {{
+            font-family: 'Fraunces', serif;
+            font-size: 1.05rem;
+            color: {PRIMARY};
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+        }}
+        .method-body {{
+            font-size: 0.92rem;
+            color: {TEXT_BODY};
+            line-height: 1.6;
+        }}
+        .section-note {{
+            color: {MUTED};
+            font-size: 0.9rem;
+            line-height: 1.55;
+            margin: 0.25rem 0 1.25rem 0;
+            max-width: 60ch;
+        }}
+        .cm-label {{
+            font-family: 'Fraunces', serif;
+            color: {TEXT};
+            font-size: 0.95rem;
+            text-align: center;
+            margin-bottom: 0.25rem;
+        }}
 
         /* Streamlit alerts */
         [data-testid="stAlert"] {{ border-radius: 10px; }}
@@ -426,6 +471,155 @@ def render_demo(model, stats, labels) -> None:
     st.pyplot(plot_top5(top_probs, top_names, correct_pos), use_container_width=True)
 
 
+def plot_per_class(rows: list[dict], color: str) -> plt.Figure:
+    """Horizontal F1 bars for a small set of gestures."""
+    with plt.rc_context(PLOT_STYLE):
+        fig, ax = plt.subplots(figsize=(4.6, 4.0))
+        names = [r["name"] if len(r["name"]) <= 28 else r["name"][:26] + "…"
+                 for r in rows[::-1]]
+        f1s = [r["f1"] for r in rows[::-1]]
+        ax.barh(range(len(rows)), f1s, color=color, height=0.62)
+        ax.set_yticks(range(len(rows)))
+        ax.set_yticklabels(names, fontsize=8.5)
+        ax.set_xlim(0, 1)
+        ax.set_xlabel("F1")
+        for i, f in enumerate(f1s):
+            ax.text(f + 0.012, i, f"{f:.2f}", va="center", fontsize=8,
+                    color=TEXT, family="JetBrains Mono")
+        ax.spines["bottom"].set_visible(False)
+        ax.tick_params(axis="x", length=0, labelbottom=False)
+        ax.tick_params(axis="y", length=0)
+        fig.tight_layout()
+    return fig
+
+
+def render_model_comparison(comparison: dict) -> None:
+    st.markdown("### Model comparison")
+    st.markdown(
+        '<div class="section-note">Random Forest on Hudgins time-domain '
+        "features against a 1D CNN trained end to end on the same windows. "
+        "Identical train/val/test split, no augmentation on either side, so "
+        "the gap between them is honest."
+        "</div>",
+        unsafe_allow_html=True,
+    )
+
+    rf = comparison.get("random_forest", {})
+    cnn = comparison.get("cnn_1d", {})
+    delta = comparison.get("delta_accuracy", 0.0)
+
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Random Forest", f"{rf.get('accuracy', 0):.1%}",
+              help="test accuracy")
+    c2.metric("1D CNN", f"{cnn.get('accuracy', 0):.1%}",
+              delta=f"{delta:+.1%}", delta_color="inverse",
+              help="test accuracy")
+    c3.metric("Macro F1 (CNN)", f"{cnn.get('macro_f1', 0):.3f}")
+
+    st.markdown("&nbsp;", unsafe_allow_html=True)
+    if RF_CONFUSION.exists() and CNN_CONFUSION.exists():
+        cm1, cm2 = st.columns(2)
+        with cm1:
+            st.markdown('<div class="cm-label">Random Forest</div>',
+                        unsafe_allow_html=True)
+            st.image(str(RF_CONFUSION), use_container_width=True)
+        with cm2:
+            st.markdown('<div class="cm-label">1D CNN</div>',
+                        unsafe_allow_html=True)
+            st.image(str(CNN_CONFUSION), use_container_width=True)
+        st.markdown(
+            '<div class="section-note" style="margin-top: 0.5rem;">'
+            "Both matrices are row-normalized. The CNN's off-diagonal mass "
+            "concentrates in the functional grasp block (classes 30–52), "
+            "which is also where the per-class F1 drops below 0.20."
+            "</div>",
+            unsafe_allow_html=True,
+        )
+
+
+def render_per_class(labels: dict) -> None:
+    if not CNN_METRICS.exists():
+        return
+    metrics = json.loads(CNN_METRICS.read_text())
+    rows = []
+    for k, v in metrics.items():
+        if not k.isdigit():
+            continue
+        cid = int(k)
+        if v.get("support", 0) == 0:
+            continue
+        rows.append({
+            "class_id": cid,
+            "name": labels.get(cid, f"class_{cid}"),
+            "f1": float(v.get("f1-score", 0.0)),
+            "support": int(v.get("support", 0)),
+        })
+    if not rows:
+        return
+    rows.sort(key=lambda r: r["f1"])
+    bottom = rows[:10]
+    top = rows[-10:][::-1]
+
+    st.markdown("### Per-class performance")
+    st.markdown(
+        '<div class="section-note">CNN F1 score per gesture on the held-out '
+        "test set. Hardest classes cluster in functional grasps where "
+        "multi-muscle coordination patterns are subtle. Easiest are the "
+        "basic finger movements with clean single-channel activations."
+        "</div>",
+        unsafe_allow_html=True,
+    )
+    c1, c2 = st.columns(2)
+    with c1:
+        st.markdown('<div class="cm-label">Hardest 10 classes</div>',
+                    unsafe_allow_html=True)
+        st.pyplot(plot_per_class(bottom, PRIMARY), use_container_width=True)
+    with c2:
+        st.markdown('<div class="cm-label">Easiest 10 classes</div>',
+                    unsafe_allow_html=True)
+        st.pyplot(plot_per_class(top, ACCENT), use_container_width=True)
+
+
+def render_methodology() -> None:
+    st.markdown("### Methodology")
+    st.markdown(
+        '<div class="section-note">How this was built, four steps.</div>',
+        unsafe_allow_html=True,
+    )
+
+    cards = [
+        ("1 · Preprocess",
+         "Load 27 subjects from NinaPro DB1 (10 channels, 100 Hz, Otto Bock "
+         "electrodes that hardware-rectify the signal). Slide 200 ms windows "
+         "with 100 ms overlap. Drop any window crossing a gesture boundary so "
+         "the labels stay clean."),
+        ("2 · Features (RF only)",
+         "Hudgins time-domain set per channel: mean absolute value, zero "
+         "crossings, slope sign changes, waveform length, RMS, variance. "
+         "Six features × ten channels = sixty per window."),
+        ("3 · Model",
+         "1D CNN: three Conv1D blocks (32 → 64 → 128 channels, kernel 5) with "
+         "batchnorm and ReLU, max-pool between them, adaptive average pool, "
+         "dropout 0.3, linear head to 53 classes. About 60k parameters total."),
+        ("4 · Train",
+         "Split by repetition (1–7 train, 8 val, 9–10 test) so the model "
+         "never sees windows from a repetition it was trained on. Adam at "
+         "lr 2e-3, batch 512, cross-entropy loss, early stopping on val "
+         "accuracy. 30 epoch cap."),
+    ]
+
+    cols = st.columns(2)
+    for i, (title, body) in enumerate(cards):
+        with cols[i % 2]:
+            st.markdown(
+                f'<div class="method-card">'
+                f'<div class="method-title">{title}</div>'
+                f'<div class="method-body">{body}</div>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
+
+
 def render_expanders(labels: dict) -> None:
     with st.expander("What are the 53 gestures?"):
         groups = [
@@ -485,7 +679,7 @@ def render_footer() -> None:
             <div class="footer-bio">UCF Data Science</div>
             <div class="footer-links">
                 <a href="{GITHUB_URL}" target="_blank">GitHub</a>
-                <a href="https://www.linkedin.com" target="_blank">LinkedIn</a>
+                <a href="https://www.linkedin.com/in/johnnynguyen04/" target="_blank">LinkedIn</a>
                 <a href="mailto:johnny060904@gmail.com">Email</a>
             </div>
             <div class="copyright">© 2026 Johnny Nguyen · EMG gesture classifier</div>
@@ -516,6 +710,12 @@ def main() -> None:
     render_stats(comparison)
     st.markdown("&nbsp;", unsafe_allow_html=True)
     render_demo(model, stats, labels)
+    st.markdown("&nbsp;", unsafe_allow_html=True)
+    render_model_comparison(comparison)
+    st.markdown("&nbsp;", unsafe_allow_html=True)
+    render_per_class(labels)
+    st.markdown("&nbsp;", unsafe_allow_html=True)
+    render_methodology()
     st.markdown("&nbsp;", unsafe_allow_html=True)
     render_expanders(labels)
     st.markdown("&nbsp;", unsafe_allow_html=True)
