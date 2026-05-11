@@ -141,7 +141,7 @@ def inject_css() -> None:
             font-weight: 500;
         }}
         .hero-card {{
-            background: radial-gradient(ellipse 130% 110% at 100% 0%, rgba(31, 165, 219, 0.13) 0%, rgba(123, 192, 67, 0.06) 50%, rgba(255, 255, 255, 0) 100%), {CARD};
+            background: linear-gradient(135deg, {CARD} 0%, {CARD} 45%, rgba(123, 192, 67, 0.05) 75%, rgba(31, 165, 219, 0.12) 100%);
             border: 1px solid {BORDER};
             border-radius: 16px;
             padding: 2.25rem 2rem 2rem 2rem;
@@ -149,6 +149,20 @@ def inject_css() -> None:
             position: relative;
             overflow: hidden;
             box-shadow: 0 2px 10px rgba(27, 54, 93, 0.04);
+        }}
+        .hero-chip {{
+            display: inline-block;
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: {PRIMARY};
+            background: rgba(31, 165, 219, 0.10);
+            border: 1px solid rgba(31, 165, 219, 0.25);
+            padding: 0.3rem 0.7rem;
+            border-radius: 999px;
+            margin-bottom: 0.9rem;
         }}
         .hero-card::before {{
             content: "";
@@ -490,6 +504,7 @@ def render_hero() -> None:
     st.markdown(
         f"""
         <div class="hero-card">
+            <div class="hero-chip">Machine learning · Biosignals</div>
             <h1 style="margin: 0 0 0.55rem 0;">EMG hand gesture classifier</h1>
             <div class="byline">by Johnny Nguyen · UCF Data Science</div>
         </div>
