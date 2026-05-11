@@ -101,6 +101,9 @@ def inject_css() -> None:
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
+        html {{ scroll-behavior: smooth; }}
+        .sec-num {{ scroll-margin-top: 80px; }}
+
         .stApp {{
             background:
                 radial-gradient(120% 95% at 50% 0%,
