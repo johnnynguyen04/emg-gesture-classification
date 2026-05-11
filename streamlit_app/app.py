@@ -48,27 +48,29 @@ def portrait_data_url() -> str | None:
 
 
 @st.cache_resource
-def emg_wave_path() -> str:
-    """Tileable EMG-style path: two identical halves so translateX -50% loops seamlessly."""
-    seg_w = 1200
-    baseline = 100
-    bursts = [(0.14, 0.06, 32), (0.42, 0.05, 44), (0.71, 0.07, 26)]
-    seg = []
-    for x in range(0, seg_w, 4):
-        t = x / seg_w
-        y = baseline + 2.2 * math.sin(t * math.pi * 4)
-        for center, w, intensity in bursts:
-            if abs(t - center) < w:
-                env = math.cos((t - center) / w * math.pi / 2) ** 2
-                spike = (math.sin(x * 0.55 + center * 90) * intensity
-                         + math.sin(x * 1.05) * intensity * 0.45
-                         + math.sin(x * 0.27) * intensity * 0.25)
-                y += spike * env
-        seg.append((x, y))
-    points = list(seg) + [(x + seg_w, y) for x, y in seg]
-    return " ".join(
-        f"{'M' if i == 0 else 'L'}{x},{y:.1f}" for i, (x, y) in enumerate(points)
-    )
+def ribbon_paths() -> tuple[str, str]:
+    """Two smooth tileable ribbon paths (width 2400, viewBox y=0..400).
+    Second half mirrors the first so a translateX -50% loop is seamless."""
+    width = 2400
+    seg = width // 2 # tile every 1200 units
+    band_top = 140
+    band_bot = 260
+    amp = 55
+
+    def wave_y(x: int, base: int, phase: float) -> float:
+        return base - amp * (
+            0.65 * math.sin((x * 2 * math.pi / seg) + phase)
+            + 0.35 * math.sin((x * 4 * math.pi / seg) + phase * 1.6)
+        )
+
+    def build(top_base: int, bot_base: int, phase: float) -> str:
+        top = [(x, wave_y(x, top_base, phase)) for x in range(0, width + 1, 24)]
+        bot = [(x, wave_y(x, bot_base, phase) + 80) for x in range(width, -1, -24)]
+        pts = top + bot
+        return ("M" + f"{pts[0][0]},{pts[0][1]:.1f} "
+                + " ".join(f"L{x},{y:.1f}" for x, y in pts[1:]) + " Z")
+
+    return build(band_top, band_top, 0.0), build(band_top + 30, band_top + 30, math.pi * 0.55)
 
 PRIMARY = "#1FA5DB"
 PRIMARY_DARK = "#1B365D"
@@ -130,17 +132,17 @@ def inject_css() -> None:
             color: {TEXT_BODY};
             position: relative;
         }}
-        /* Animated EMG-style line wave through the middle of the page */
+        /* Flowing ribbon wave through the middle of the page */
         .emg-bg {{
             position: fixed;
             top: 50%;
             left: 0;
             width: 200%;
-            height: 240px;
+            height: 420px;
             transform: translate3d(0, -50%, 0);
             pointer-events: none;
             z-index: 0;
-            animation: emgFlow 55s linear infinite;
+            animation: emgFlow 30s linear infinite;
         }}
         .emg-bg svg {{ width: 100%; height: 100%; display: block; }}
         @keyframes emgFlow {{
@@ -918,7 +920,7 @@ def render_footer() -> None:
                 <a href="https://www.linkedin.com/in/johnnynguyen04/" target="_blank">LinkedIn</a>
                 <a href="mailto:johnny060904@gmail.com">Email</a>
             </div>
-            <div class="copyright">© 2026 Johnny Nguyen · EMG gesture classifier</div>
+            <div class="copyright">© 2026 Johnny Nguyen · EMG Gesture Classifier</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -926,15 +928,14 @@ def render_footer() -> None:
 
 
 def render_emg_background() -> None:
+    p1, p2 = ribbon_paths()
     st.markdown(
         f"""
         <div class="emg-bg" aria-hidden="true">
-            <svg viewBox="0 0 2400 200" preserveAspectRatio="none"
+            <svg viewBox="0 0 2400 400" preserveAspectRatio="none"
                  xmlns="http://www.w3.org/2000/svg">
-                <path d="{emg_wave_path()}"
-                      stroke="{PRIMARY}" stroke-width="1.6"
-                      fill="none" stroke-linecap="round"
-                      opacity="0.22"/>
+                <path d="{p2}" fill="{PRIMARY}" opacity="0.045"/>
+                <path d="{p1}" fill="{PRIMARY}" opacity="0.075"/>
             </svg>
         </div>
         """,
