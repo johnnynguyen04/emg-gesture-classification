@@ -86,7 +86,7 @@ def inject_css() -> None:
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
         html {{ scroll-behavior: smooth; }}
-        .sec-num {{ scroll-margin-top: 80px; }}
+        .sec-num {{ scroll-margin-top: 130px; }}
 
         .stApp {{
             background:
@@ -545,18 +545,19 @@ def inject_css() -> None:
         /* Sticky top nav with glass-blur backdrop */
         .top-nav {{
             position: sticky;
-            top: 0;
+            top: 56px;
             z-index: 100;
             display: flex;
             align-items: center;
             justify-content: flex-start;
             gap: 0.4rem;
             padding: 0.7rem 1rem;
-            margin: -2.5rem -1rem 1.5rem -1rem;
+            margin: -1.5rem -1rem 1.5rem -1rem;
             background: rgba(255, 255, 255, 0.72);
             backdrop-filter: blur(18px) saturate(180%);
             -webkit-backdrop-filter: blur(18px) saturate(180%);
             border-bottom: 1px solid {BORDER};
+            border-radius: 10px;
         }}
         .top-nav .brand {{
             font-family: 'Fraunces', serif;
