@@ -26,17 +26,18 @@ COMPARISON = ROOT / "results" / "metrics" / "comparison.json"
 SAMPLES_DIR = ROOT / "streamlit_app" / "samples"
 GITHUB_URL = "https://github.com/johnnynguyen04/emg-gesture-classification"
 
-PRIMARY = "#1e6fa0"
-PRIMARY_DARK = "#155a85"
+PRIMARY = "#0e7fb8"
+PRIMARY_DARK = "#0a6da0"
 ACCENT = "#5fa238"
-TEXT = "#1a2530"
-TEXT_BODY = "#3a4753"
-MUTED = "#6b6a64"
-BORDER = "#e8dfd0"
-BG = "#faf6ef"
-CARD = "#fdfaf3"
+TEXT = "#0f172a"
+TEXT_BODY = "#334155"
+MUTED = "#64748b"
+BORDER = "#e2e8f0"
+BG = "#ffffff"
+CARD = "#ffffff"
+CARD_TINT = "#f8fafc"
 CHANNEL_CMAP = LinearSegmentedColormap.from_list(
-    "channels", ["#7eb3d4", "#1e6fa0", "#0c3c5e"]
+    "channels", ["#93c5e8", "#0e7fb8", "#0a4a70"]
 )
 
 PLOT_STYLE = {
@@ -54,9 +55,9 @@ PLOT_STYLE = {
     "xtick.labelsize": 9,
     "ytick.labelsize": 9,
     "axes.labelsize": 10,
-    "figure.facecolor": CARD,
-    "axes.facecolor": CARD,
-    "savefig.facecolor": CARD,
+    "figure.facecolor": BG,
+    "axes.facecolor": BG,
+    "savefig.facecolor": BG,
 }
 
 
@@ -74,29 +75,30 @@ def inject_css() -> None:
     st.markdown(
         f"""
         <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
-        html, body, [class*="st-"], button, input, textarea, select {{
-            font-family: 'Inter Tight', -apple-system, BlinkMacSystemFont, sans-serif !important;
+        .stApp {{
+            background: {BG};
+            font-family: 'Inter Tight', -apple-system, BlinkMacSystemFont, sans-serif;
             color: {TEXT_BODY};
         }}
-        h1, h2, h3 {{
-            font-family: 'Fraunces', Georgia, serif !important;
+        .stApp h1, .stApp h2, .stApp h3, .stApp h4 {{
+            font-family: 'Fraunces', Georgia, serif;
             font-weight: 500;
             letter-spacing: -0.01em;
             color: {TEXT};
         }}
-        h1 {{ font-weight: 500; }}
+        .stApp h1 {{ color: {PRIMARY}; font-weight: 600; }}
         [data-testid="stMetricValue"] {{
             font-family: 'JetBrains Mono', monospace !important;
             font-weight: 500;
-            color: {TEXT};
-            font-size: 1.6rem !important;
+            color: {PRIMARY};
+            font-size: 1.7rem !important;
         }}
         [data-testid="stMetricLabel"] {{
-            font-size: 0.72rem !important;
+            font-size: 0.7rem !important;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.1em;
             color: {MUTED};
             font-weight: 500;
         }}
@@ -105,19 +107,19 @@ def inject_css() -> None:
             border: 1px solid {BORDER};
             border-radius: 12px;
             padding: 1rem 1.25rem;
+            box-shadow: 0 1px 3px rgba(14, 127, 184, 0.04);
         }}
-        .stButton button, .stLinkButton a {{
+        .stButton button, .stLinkButton a, .stDownloadButton button {{
             border-radius: 8px !important;
             border: 1px solid {BORDER} !important;
         }}
         hr {{ border-color: {BORDER}; }}
         .small-muted {{ color: {MUTED}; font-size: 0.9rem; line-height: 1.6; }}
-        .byline {{ color: {MUTED}; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.02em; }}
-        .demo-card {{
-            background: {CARD};
-            border: 1px solid {BORDER};
-            border-radius: 14px;
-            padding: 1.5rem;
+        .byline {{
+            color: {MUTED};
+            font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.02em;
         }}
         .prose {{
             font-family: 'Fraunces', Georgia, serif;
@@ -137,8 +139,8 @@ def inject_css() -> None:
             margin-top: 2rem;
         }}
         .avatar {{
-            width: 56px;
-            height: 56px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             background: linear-gradient(135deg, {PRIMARY}, {PRIMARY_DARK});
             color: white;
@@ -146,15 +148,16 @@ def inject_css() -> None:
             align-items: center;
             justify-content: center;
             font-family: 'Fraunces', serif;
-            font-size: 1.4rem;
-            font-weight: 500;
+            font-size: 1.5rem;
+            font-weight: 600;
             margin-bottom: 0.75rem;
         }}
         .footer-name {{
             font-family: 'Fraunces', serif;
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             color: {TEXT};
             margin-bottom: 0.25rem;
+            font-weight: 500;
         }}
         .footer-bio {{ color: {MUTED}; font-size: 0.9rem; margin-bottom: 1rem; }}
         .footer-links a {{
@@ -162,12 +165,15 @@ def inject_css() -> None:
             text-decoration: none;
             font-size: 0.9rem;
             margin: 0 0.6rem;
+            font-weight: 500;
         }}
         .footer-links a:hover {{ text-decoration: underline; }}
         .copyright {{ color: {MUTED}; font-size: 0.78rem; margin-top: 1rem; }}
         section[data-testid="stSidebar"] {{ display: none; }}
-        .stApp {{ background: {BG}; }}
         .block-container {{ max-width: 760px; padding-top: 2rem; }}
+
+        /* Streamlit alerts: cleaner colored borders, no default tinted bg */
+        [data-testid="stAlert"] {{ border-radius: 10px; }}
         </style>
         """,
         unsafe_allow_html=True,
@@ -255,9 +261,9 @@ def true_class_from_filename(name: str) -> int | None:
 def render_hero() -> None:
     st.markdown(
         f"""
-        <div style="margin-bottom: 1.5rem;">
-            <h1 style="font-size: 2.4rem; margin: 0 0 0.5rem 0;">EMG hand gesture classifier</h1>
-            <div class="byline">by Johnny Nguyen · UCF Data Science · intern</div>
+        <div style="margin-bottom: 1.75rem;">
+            <h1 style="font-size: 2.5rem; margin: 0 0 0.5rem 0;">EMG hand gesture classifier</h1>
+            <div class="byline">by Johnny Nguyen · UCF Data Science</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -412,23 +418,22 @@ def render_why() -> None:
     st.markdown("### Why I built this")
     st.markdown(
         '<div class="prose">'
-        "I built this as a biosignal project. EMG-driven gesture recognition "
-        "is the same family of problem clinical systems try to solve, and "
-        "that overlap is what drew me to it. So I wanted to build a project "
-        "that overlapped with that work end to end: load the raw signals, "
-        "preprocess them properly, train two classifiers worth comparing, and "
-        "write up where each one wins."
+        "I wanted to take a biosignal project end to end: load raw EMG, "
+        "preprocess it properly, train two classifiers worth comparing, and "
+        "write up where each one wins. EMG-driven gesture recognition is the "
+        "same family of problem a clinical EMG system has to solve, "
+        "and that overlap is what drew me to it."
         "</div>",
         unsafe_allow_html=True,
     )
     st.markdown(
         '<div class="prose" style="margin-top: 1rem;">'
         "I picked NinaPro DB1 over the newer DB2 or DB5 because DB1 has 53 "
-        "gesture classes and uses the same kind of pre-rectified EMG envelope "
-        " electrodes produce. The honest result of this run: my "
-        "small CNN underperformed the Random Forest baseline by 18 points. "
-        "The README on GitHub walks through why and what I would do "
-        "differently next time."
+        "gesture classes and uses a pre-rectified EMG envelope, the kind of "
+        "signal a real clinical electrode setup tends to produce. The honest "
+        "result of this run: my small CNN underperformed the Random Forest "
+        "baseline by 18 points. The README on GitHub walks through why and "
+        "what I would do differently next time."
         "</div>",
         unsafe_allow_html=True,
     )
@@ -440,7 +445,7 @@ def render_footer() -> None:
         <div class="footer-card">
             <div class="avatar">JN</div>
             <div class="footer-name">Johnny Nguyen</div>
-            <div class="footer-bio">UCF Data Science, class of 2027 · intern</div>
+            <div class="footer-bio">UCF Data Science</div>
             <div class="footer-links">
                 <a href="{GITHUB_URL}" target="_blank">GitHub</a>
                 <a href="https://www.linkedin.com" target="_blank">LinkedIn</a>
