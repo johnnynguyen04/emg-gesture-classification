@@ -1,0 +1,28 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# raw and processed data stay out of git (large, regenerable from DB1)
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# pipeline run logs
+results/pipeline_run.log
+
+# default-ignore model checkpoints except the published CNN one
+*.pth
+*.joblib
+*.pkl
+*.pt
+!results/metrics/cnn_best.pt
+
+.env
+.DS_Store
+.vscode/
+.idea/
