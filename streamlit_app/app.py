@@ -238,6 +238,7 @@ def inject_css() -> None:
             height: 72px;
             border-radius: 50%;
             object-fit: cover;
+            object-position: center top;
             margin-bottom: 0.85rem;
             box-shadow: 0 4px 14px rgba(31, 165, 219, 0.25);
             animation: avatarPulse 4s ease-in-out infinite;
@@ -408,7 +409,45 @@ def inject_css() -> None:
         }}
 
         /* Streamlit alerts */
-        [data-testid="stAlert"] {{ border-radius: 10px; }}
+        [data-testid="stAlert"] {{
+            border-radius: 10px;
+            animation: smoothFade 0.35s ease-out;
+        }}
+
+        /* Smooth fade on plots, images, and prediction renders so switching
+           between samples doesn't snap-cut. No animation-fill-mode set,
+           so default opacity is 1 if animation never fires. */
+        @keyframes smoothFade {{
+            from {{ opacity: 0; transform: translateY(3px); }}
+            to {{ opacity: 1; transform: translateY(0); }}
+        }}
+        [data-testid="stPyplotChart"] img,
+        [data-testid="stImage"] img {{
+            animation: smoothFade 0.42s ease-out;
+        }}
+        .pred-reveal {{
+            animation: smoothFade 0.32s ease-out;
+        }}
+
+        /* Live pulse dot — signals the demo is interactive */
+        .live-dot {{
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: {ACCENT};
+            margin-right: 0.55rem;
+            vertical-align: middle;
+            position: relative;
+            top: -2px;
+            box-shadow: 0 0 0 0 rgba(95, 162, 56, 0.65);
+            animation: livePulse 2.1s ease-out infinite;
+        }}
+        @keyframes livePulse {{
+            0% {{ box-shadow: 0 0 0 0 rgba(95, 162, 56, 0.65); }}
+            70% {{ box-shadow: 0 0 0 10px rgba(95, 162, 56, 0); }}
+            100% {{ box-shadow: 0 0 0 0 rgba(95, 162, 56, 0); }}
+        }}
 
         /* Card hover lift */
         [data-testid="stMetric"] {{
@@ -540,7 +579,7 @@ def render_stats(comparison: dict) -> None:
 
 
 def render_demo(model, stats, labels) -> None:
-    st.markdown("### Live Classification")
+    st.markdown('<h3 style="margin-top:0.25rem;"><span class="live-dot"></span>Live Classification</h3>', unsafe_allow_html=True)
     samples = sorted(SAMPLES_DIR.glob("*.npy")) if SAMPLES_DIR.exists() else []
 
     source = st.radio(
@@ -595,25 +634,20 @@ def render_demo(model, stats, labels) -> None:
                     unsafe_allow_html=True)
         st.pyplot(plot_signal(window), use_container_width=True)
     with pred_col:
-        st.markdown(f'<div style="color:{MUTED}; font-size: 0.75rem; '
-                    f'text-transform: uppercase; letter-spacing: 0.08em; '
-                    f'font-weight: 500; margin-bottom: 0.4rem;">Prediction</div>',
-                    unsafe_allow_html=True)
         st.markdown(
-            f'<div style="font-family: \'Fraunces\', serif; font-size: 1.5rem; '
-            f'font-weight: 500; color: {TEXT}; line-height: 1.15; '
-            f'margin-bottom: 0.5rem;">{pred_name}</div>',
-            unsafe_allow_html=True,
-        )
-        st.markdown(
+            f'<div class="pred-reveal">'
+            f'<div style="color:{MUTED}; font-size: 0.75rem; '
+            f'text-transform: uppercase; letter-spacing: 0.08em; '
+            f'font-weight: 600; margin-bottom: 0.4rem;">Prediction</div>'
+            f'<div style="font-family: \'Manrope\', sans-serif; font-size: 1.5rem; '
+            f'font-weight: 700; color: {PRIMARY_DARK}; line-height: 1.15; '
+            f'margin-bottom: 0.5rem; letter-spacing: -0.01em;">{pred_name}</div>'
             f'<div style="font-family: \'JetBrains Mono\', monospace; '
             f'font-size: 1.1rem; color: {PRIMARY}; margin-bottom: 0.25rem;">'
-            f'{top_probs[0]:.1%} confidence</div>',
-            unsafe_allow_html=True,
-        )
-        st.markdown(
+            f'{top_probs[0]:.1%} confidence</div>'
             f'<div class="small-muted">group · {gesture_group(pred_id)}<br>'
-            f'class id · {pred_id}</div>',
+            f'class id · {pred_id}</div>'
+            f'</div>',
             unsafe_allow_html=True,
         )
 
