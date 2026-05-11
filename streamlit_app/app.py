@@ -104,21 +104,21 @@ def inject_css() -> None:
         .stApp {{
             background:
                 radial-gradient(120% 95% at 50% 0%,
-                    #ffffff 25%,
-                    rgba(31, 165, 219, 0.07) 50%,
-                    rgba(123, 192, 67, 0.05) 65%,
-                    rgba(31, 165, 219, 0.11) 82%,
-                    rgba(27, 54, 93, 0.08) 100%
+                    #ffffff 24%,
+                    rgba(31, 165, 219, 0.12) 48%,
+                    rgba(123, 192, 67, 0.08) 64%,
+                    rgba(31, 165, 219, 0.18) 80%,
+                    rgba(27, 54, 93, 0.12) 100%
                 );
             background-attachment: fixed;
             background-size: 100% 100%;
             font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
             color: {TEXT_BODY};
-            animation: bgBreathe 7s ease-in-out infinite;
+            animation: bgBreathe 11s ease-in-out infinite;
         }}
         @keyframes bgBreathe {{
             0% {{ background-size: 100% 100%; background-position: 50% 0%; }}
-            50% {{ background-size: 138% 138%; background-position: 35% 10%; }}
+            50% {{ background-size: 116% 116%; background-position: 42% 6%; }}
             100% {{ background-size: 100% 100%; background-position: 50% 0%; }}
         }}
         .stApp h1, .stApp h2 {{
@@ -206,9 +206,9 @@ def inject_css() -> None:
         }}
         .hero-stat-unit {{
             font-size: 0.55em;
-            font-weight: 500;
-            color: {MUTED};
-            margin-left: 0.06em;
+            font-weight: 700;
+            color: {PRIMARY_DARK};
+            margin-left: 0.05em;
         }}
         .hero-stat-label {{
             font-family: 'JetBrains Mono', monospace;
@@ -221,7 +221,40 @@ def inject_css() -> None:
         }}
         .side-stack {{
             position: relative;
-            min-height: 260px;
+            min-height: 240px;
+            margin-bottom: 1rem;
+        }}
+        .model-card {{
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(14px) saturate(160%);
+            -webkit-backdrop-filter: blur(14px) saturate(160%);
+            border: 1px solid {BORDER};
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+        }}
+        .model-card-label {{
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: {PRIMARY};
+            margin-bottom: 0.6rem;
+        }}
+        .model-card-row {{
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 0.35rem 0;
+            border-bottom: 1px solid {BORDER};
+            font-size: 0.78rem;
+        }}
+        .model-card-row:last-child {{ border-bottom: none; }}
+        .model-card-row span:first-child {{ color: {MUTED}; }}
+        .model-card-row span:last-child {{
+            color: {PRIMARY_DARK};
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
         }}
         .side-card {{
             background: rgba(255, 255, 255, 0.7);
@@ -602,7 +635,7 @@ def inject_css() -> None:
             z-index: 100;
             display: flex;
             align-items: center;
-            justify-content: flex-end;
+            justify-content: flex-start;
             gap: 0.4rem;
             padding: 0.7rem 1rem;
             margin: -2.5rem -1rem 1.5rem -1rem;
@@ -967,6 +1000,12 @@ def render_hero(comparison: dict, labels: dict) -> None:
                         </div>
                         <div class="side-card-meta"><span>CONFIDENCE</span><span>FUNCTIONAL GRASP</span></div>
                     </div>
+                </div>
+                <div class="model-card">
+                    <div class="model-card-label">Model</div>
+                    <div class="model-card-row"><span>Architecture</span><span>1D CNN</span></div>
+                    <div class="model-card-row"><span>Parameters</span><span>60,309</span></div>
+                    <div class="model-card-row"><span>Test accuracy</span><span>{cnn.get('accuracy', 0):.1%}</span></div>
                 </div>
             </div>
         </div>
