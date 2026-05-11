@@ -104,21 +104,21 @@ def inject_css() -> None:
         .stApp {{
             background:
                 radial-gradient(120% 95% at 50% 0%,
-                    #ffffff 24%,
-                    rgba(31, 165, 219, 0.12) 48%,
-                    rgba(123, 192, 67, 0.08) 64%,
-                    rgba(31, 165, 219, 0.18) 80%,
-                    rgba(27, 54, 93, 0.12) 100%
+                    #ffffff 26%,
+                    rgba(31, 165, 219, 0.09) 48%,
+                    rgba(123, 192, 67, 0.06) 64%,
+                    rgba(31, 165, 219, 0.14) 80%,
+                    rgba(27, 54, 93, 0.10) 100%
                 );
             background-attachment: fixed;
             background-size: 100% 100%;
             font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
             color: {TEXT_BODY};
-            animation: bgBreathe 11s ease-in-out infinite;
+            animation: bgBreathe 10s ease-in-out infinite;
         }}
         @keyframes bgBreathe {{
             0% {{ background-size: 100% 100%; background-position: 50% 0%; }}
-            50% {{ background-size: 110% 110%; background-position: 46% 4%; }}
+            50% {{ background-size: 114% 114%; background-position: 44% 6%; }}
             100% {{ background-size: 100% 100%; background-position: 50% 0%; }}
         }}
         .stApp h1, .stApp h2 {{
