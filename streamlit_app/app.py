@@ -245,26 +245,20 @@ def inject_css() -> None:
         .text-link {{
             display: inline-flex;
             align-items: center;
-            gap: 0.45rem;
+            gap: 0.5rem;
             font-family: 'Manrope', sans-serif;
             font-size: 0.95rem;
             font-weight: 600;
-            color: {PRIMARY_DARK};
-            text-decoration: none;
-            padding: 0.3rem 0;
-            border-bottom: 1.5px solid {PRIMARY};
-            transition: gap 0.25s ease, color 0.25s ease;
+            color: {PRIMARY} !important;
+            text-decoration: none !important;
+            border: none !important;
+            transition: gap 0.25s ease;
         }}
-        .text-link:hover {{
-            color: {PRIMARY};
-            gap: 0.7rem;
-        }}
+        .text-link:hover {{ gap: 0.8rem; }}
         .text-link .arrow {{
             font-size: 1.05rem;
             line-height: 1;
-            transition: transform 0.25s ease;
         }}
-        .text-link:hover .arrow {{ transform: translateX(2px); }}
         .prose {{
             font-family: 'Manrope', sans-serif;
             font-size: 1.02rem;
@@ -1050,11 +1044,7 @@ def render_why() -> None:
 
 
 def render_footer() -> None:
-    portrait = portrait_data_url()
-    avatar = (
-        f'<div class="avatar-wrap"><img src="{portrait}" alt="Johnny Nguyen" /></div>'
-        if portrait else '<div class="avatar">JN</div>'
-    )
+    avatar = '<div class="avatar">JN</div>'
     st.markdown(
         f"""
         <div class="footer-card">
