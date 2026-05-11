@@ -30,23 +30,24 @@ CNN_CONFUSION = ROOT / "results" / "figures" / "cnn_confusion.png"
 SAMPLES_DIR = ROOT / "streamlit_app" / "samples"
 GITHUB_URL = "https://github.com/johnnynguyen04/emg-gesture-classification"
 
-PRIMARY = "#0e7fb8"
-PRIMARY_DARK = "#0a6da0"
-ACCENT = "#5fa238"
-TEXT = "#0f172a"
-TEXT_BODY = "#334155"
-MUTED = "#64748b"
-BORDER = "#e2e8f0"
+PRIMARY = "#1FA5DB"
+PRIMARY_DARK = "#1B365D"
+ACCENT = "#7BC043"
+ACCENT_DARK = "#2A5D43"
+TEXT = "#0F1F35"
+TEXT_BODY = "#3A4B61"
+MUTED = "#6B7A8F"
+BORDER = "#dde4ed"
 BG = "#ffffff"
 CARD = "#ffffff"
-CARD_TINT = "#f8fafc"
+CARD_TINT = "#f4f8fc"
 CHANNEL_CMAP = LinearSegmentedColormap.from_list(
-    "channels", ["#93c5e8", "#0e7fb8", "#0a4a70"]
+    "channels", ["#a5d6ed", "#1FA5DB", "#0F4B70"]
 )
 
 PLOT_STYLE = {
     "font.family": "sans-serif",
-    "font.sans-serif": ["Inter Tight", "Inter", "Helvetica", "Arial", "sans-serif"],
+    "font.sans-serif": ["Manrope", "Inter", "Helvetica", "Arial", "sans-serif"],
     "axes.edgecolor": BORDER,
     "axes.labelcolor": MUTED,
     "axes.spines.top": False,
@@ -81,89 +82,131 @@ def inject_css() -> None:
     st.markdown(
         f"""
         <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
         .stApp {{
             background: {BG};
-            font-family: 'Inter Tight', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
             color: {TEXT_BODY};
         }}
         .stApp h1, .stApp h2, .stApp h3, .stApp h4 {{
-            font-family: 'Fraunces', Georgia, serif;
-            font-weight: 500;
-            letter-spacing: -0.01em;
-            color: {TEXT};
+            font-family: 'Manrope', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: {PRIMARY_DARK};
         }}
-        .stApp h1 {{ color: {PRIMARY}; font-weight: 600; }}
+        .stApp h1 {{
+            font-weight: 800;
+            font-size: 2.6rem !important;
+            color: {PRIMARY_DARK};
+        }}
+        .stApp h3 {{
+            font-weight: 700;
+            font-size: 1.4rem !important;
+            color: {PRIMARY_DARK};
+        }}
         [data-testid="stMetricValue"] {{
             font-family: 'JetBrains Mono', monospace !important;
-            font-weight: 500;
+            font-weight: 600;
             color: {PRIMARY};
-            font-size: 1.7rem !important;
+            font-size: 1.75rem !important;
         }}
         [data-testid="stMetricLabel"] {{
             font-size: 0.7rem !important;
             text-transform: uppercase;
             letter-spacing: 0.1em;
             color: {MUTED};
-            font-weight: 500;
+            font-weight: 600;
         }}
         [data-testid="stMetric"] {{
             background: {CARD};
             border: 1px solid {BORDER};
-            border-radius: 12px;
+            border-top: 3px solid {PRIMARY};
+            border-radius: 10px;
             padding: 1rem 1.25rem;
-            box-shadow: 0 1px 3px rgba(14, 127, 184, 0.04);
+            box-shadow: 0 2px 6px rgba(27, 54, 93, 0.04);
         }}
         .stButton button, .stLinkButton a, .stDownloadButton button {{
             border-radius: 8px !important;
             border: 1px solid {BORDER} !important;
+            font-weight: 600 !important;
         }}
         hr {{ border-color: {BORDER}; }}
         .small-muted {{ color: {MUTED}; font-size: 0.9rem; line-height: 1.6; }}
         .byline {{
             color: {MUTED};
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             font-family: 'JetBrains Mono', monospace;
             letter-spacing: 0.02em;
+            font-weight: 500;
+        }}
+        .hero-card {{
+            background: radial-gradient(ellipse at top right, rgba(31, 165, 219, 0.10) 0%, rgba(123, 192, 67, 0.04) 35%, rgba(255, 255, 255, 0) 70%), {CARD};
+            border: 1px solid {BORDER};
+            border-radius: 16px;
+            padding: 2.25rem 2rem 2rem 2rem;
+            margin-bottom: 1.75rem;
+            position: relative;
+            overflow: hidden;
+        }}
+        .hero-card::before {{
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, {PRIMARY} 0%, {ACCENT} 35%, {PRIMARY} 70%, {ACCENT} 100%);
+            background-size: 220% 100%;
+            animation: gradientShift 14s ease-in-out infinite;
+        }}
+        @keyframes gradientShift {{
+            0% {{ background-position: 0% 50%; }}
+            50% {{ background-position: 100% 50%; }}
+            100% {{ background-position: 0% 50%; }}
         }}
         .prose {{
-            font-family: 'Fraunces', Georgia, serif;
-            font-size: 1.05rem;
+            font-family: 'Manrope', sans-serif;
+            font-size: 1.02rem;
             line-height: 1.7;
             color: {TEXT_BODY};
-            border-left: 2px solid {ACCENT};
+            border-left: 3px solid {ACCENT};
             padding-left: 1.25rem;
             margin: 0.5rem 0;
+            font-weight: 400;
         }}
         .footer-card {{
-            background: {CARD};
+            background: linear-gradient(180deg, {CARD_TINT} 0%, {CARD} 100%);
             border: 1px solid {BORDER};
             border-radius: 14px;
-            padding: 1.75rem;
+            padding: 2rem 1.75rem;
             text-align: center;
             margin-top: 2rem;
         }}
         .avatar {{
-            width: 60px;
-            height: 60px;
+            width: 64px;
+            height: 64px;
             border-radius: 50%;
-            background: linear-gradient(135deg, {PRIMARY}, {PRIMARY_DARK});
+            background: linear-gradient(135deg, {PRIMARY} 0%, {PRIMARY_DARK} 100%);
             color: white;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Fraunces', serif;
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 0.75rem;
+            font-family: 'Manrope', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.85rem;
+            box-shadow: 0 4px 14px rgba(31, 165, 219, 0.25);
+            animation: avatarPulse 4s ease-in-out infinite;
+        }}
+        @keyframes avatarPulse {{
+            0%, 100% {{ box-shadow: 0 4px 14px rgba(31, 165, 219, 0.20); }}
+            50% {{ box-shadow: 0 6px 22px rgba(31, 165, 219, 0.42); }}
         }}
         .footer-name {{
-            font-family: 'Fraunces', serif;
-            font-size: 1.15rem;
-            color: {TEXT};
+            font-family: 'Manrope', sans-serif;
+            font-size: 1.2rem;
+            color: {PRIMARY_DARK};
             margin-bottom: 0.25rem;
-            font-weight: 500;
+            font-weight: 700;
         }}
         .footer-bio {{ color: {MUTED}; font-size: 0.9rem; margin-bottom: 1rem; }}
         .footer-links a {{
@@ -171,52 +214,58 @@ def inject_css() -> None:
             text-decoration: none;
             font-size: 0.9rem;
             margin: 0 0.6rem;
-            font-weight: 500;
+            font-weight: 600;
         }}
         .footer-links a:hover {{ text-decoration: underline; }}
         .copyright {{ color: {MUTED}; font-size: 0.78rem; margin-top: 1rem; }}
         section[data-testid="stSidebar"] {{ display: none; }}
-        .block-container {{ max-width: 760px; padding-top: 2rem; }}
+        .block-container {{ max-width: 780px; padding-top: 2rem; }}
 
         .method-card {{
             background: {CARD};
             border: 1px solid {BORDER};
-            border-radius: 12px;
-            padding: 1.25rem;
+            border-left: 3px solid {ACCENT};
+            border-radius: 10px;
+            padding: 1.25rem 1.35rem;
             margin-bottom: 1rem;
             height: 100%;
-            transition: box-shadow 0.18s ease, transform 0.18s ease;
+            transition: box-shadow 0.18s ease, transform 0.18s ease, border-left-color 0.18s ease;
         }}
         .method-card:hover {{
-            box-shadow: 0 4px 14px rgba(14, 127, 184, 0.08);
-            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(27, 54, 93, 0.08);
+            transform: translateY(-2px);
+            border-left-color: {PRIMARY};
         }}
         .method-title {{
-            font-family: 'Fraunces', serif;
-            font-size: 1.05rem;
-            color: {PRIMARY};
+            font-family: 'Manrope', sans-serif;
+            font-size: 1rem;
+            color: {PRIMARY_DARK};
             margin-bottom: 0.5rem;
-            font-weight: 500;
+            font-weight: 700;
             letter-spacing: -0.01em;
         }}
         .method-body {{
             font-size: 0.92rem;
             color: {TEXT_BODY};
             line-height: 1.6;
+            font-weight: 400;
         }}
         .section-note {{
             color: {MUTED};
-            font-size: 0.9rem;
-            line-height: 1.55;
-            margin: 0.25rem 0 1.25rem 0;
-            max-width: 60ch;
+            font-size: 0.92rem;
+            line-height: 1.6;
+            margin: 0.25rem 0 1.5rem 0;
+            max-width: 62ch;
         }}
         .cm-label {{
-            font-family: 'Fraunces', serif;
-            color: {TEXT};
+            font-family: 'Manrope', sans-serif;
+            color: {PRIMARY_DARK};
             font-size: 0.95rem;
             text-align: center;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.4rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
         }}
 
         /* Streamlit alerts */
@@ -343,8 +392,8 @@ def true_class_from_filename(name: str) -> int | None:
 def render_hero() -> None:
     st.markdown(
         f"""
-        <div style="margin-bottom: 1.75rem;">
-            <h1 style="font-size: 2.5rem; margin: 0 0 0.5rem 0;">EMG hand gesture classifier</h1>
+        <div class="hero-card">
+            <h1 style="margin: 0 0 0.55rem 0;">EMG hand gesture classifier</h1>
             <div class="byline">by Johnny Nguyen · UCF Data Science</div>
         </div>
         """,
