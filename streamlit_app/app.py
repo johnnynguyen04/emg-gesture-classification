@@ -118,7 +118,7 @@ def inject_css() -> None:
         }}
         @keyframes bgBreathe {{
             0% {{ background-size: 100% 100%; background-position: 50% 0%; }}
-            50% {{ background-size: 116% 116%; background-position: 42% 6%; }}
+            50% {{ background-size: 110% 110%; background-position: 46% 4%; }}
             100% {{ background-size: 100% 100%; background-position: 50% 0%; }}
         }}
         .stApp h1, .stApp h2 {{
