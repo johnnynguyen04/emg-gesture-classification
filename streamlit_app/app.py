@@ -24,21 +24,24 @@ NORM_STATS = ROOT / "results" / "metrics" / "norm_stats.npz"
 LABEL_MAP = ROOT / "results" / "metrics" / "label_map.json"
 COMPARISON = ROOT / "results" / "metrics" / "comparison.json"
 SAMPLES_DIR = ROOT / "streamlit_app" / "samples"
+GITHUB_URL = "https://github.com/johnnynguyen04/emg-gesture-classification"
 
-PRIMARY = "#0891b2"
-PRIMARY_DARK = "#0e7490"
-ACCENT = "#059669"
-TEXT = "#18181b"
-MUTED = "#71717a"
-BORDER = "#e4e4e7"
-BG = "#fafafa"
+PRIMARY = "#1e6fa0"
+PRIMARY_DARK = "#155a85"
+ACCENT = "#5fa238"
+TEXT = "#1a2530"
+TEXT_BODY = "#3a4753"
+MUTED = "#6b6a64"
+BORDER = "#e8dfd0"
+BG = "#faf6ef"
+CARD = "#fdfaf3"
 CHANNEL_CMAP = LinearSegmentedColormap.from_list(
-    "channels", ["#a5f3fc", "#0891b2", "#0c4a6e"]
+    "channels", ["#7eb3d4", "#1e6fa0", "#0c3c5e"]
 )
 
 PLOT_STYLE = {
     "font.family": "sans-serif",
-    "font.sans-serif": ["Geist", "Inter", "Helvetica", "Arial", "sans-serif"],
+    "font.sans-serif": ["Inter Tight", "Inter", "Helvetica", "Arial", "sans-serif"],
     "axes.edgecolor": BORDER,
     "axes.labelcolor": MUTED,
     "axes.spines.top": False,
@@ -51,9 +54,9 @@ PLOT_STYLE = {
     "xtick.labelsize": 9,
     "ytick.labelsize": 9,
     "axes.labelsize": 10,
-    "figure.facecolor": BG,
-    "axes.facecolor": BG,
-    "savefig.facecolor": BG,
+    "figure.facecolor": CARD,
+    "axes.facecolor": CARD,
+    "savefig.facecolor": CARD,
 }
 
 
@@ -69,34 +72,102 @@ def gesture_group(class_id: int) -> str:
 
 def inject_css() -> None:
     st.markdown(
-        """
+        f"""
         <style>
-        @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
-        html, body, [class*="st-"], button, input, textarea, select {
-            font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif !important;
-        }
-        h1, h2, h3, h4 {
-            font-family: 'Geist', sans-serif !important;
-            letter-spacing: -0.02em;
-            color: #18181b;
-        }
-        h1 { font-weight: 600; }
-        [data-testid="stMetricValue"] {
-            font-family: 'Geist Mono', monospace !important;
+        html, body, [class*="st-"], button, input, textarea, select {{
+            font-family: 'Inter Tight', -apple-system, BlinkMacSystemFont, sans-serif !important;
+            color: {TEXT_BODY};
+        }}
+        h1, h2, h3 {{
+            font-family: 'Fraunces', Georgia, serif !important;
             font-weight: 500;
-            color: #18181b;
-        }
-        [data-testid="stMetricLabel"] {
-            font-size: 0.75rem !important;
+            letter-spacing: -0.01em;
+            color: {TEXT};
+        }}
+        h1 {{ font-weight: 500; }}
+        [data-testid="stMetricValue"] {{
+            font-family: 'JetBrains Mono', monospace !important;
+            font-weight: 500;
+            color: {TEXT};
+            font-size: 1.6rem !important;
+        }}
+        [data-testid="stMetricLabel"] {{
+            font-size: 0.72rem !important;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #71717a;
-        }
-        [data-testid="stSidebar"] { border-right: 1px solid #e4e4e7; }
-        .stButton button, .stDownloadButton button { border-radius: 6px; }
-        hr { border-color: #e4e4e7; }
-        .small-muted { color: #71717a; font-size: 0.85rem; }
+            letter-spacing: 0.08em;
+            color: {MUTED};
+            font-weight: 500;
+        }}
+        [data-testid="stMetric"] {{
+            background: {CARD};
+            border: 1px solid {BORDER};
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+        }}
+        .stButton button, .stLinkButton a {{
+            border-radius: 8px !important;
+            border: 1px solid {BORDER} !important;
+        }}
+        hr {{ border-color: {BORDER}; }}
+        .small-muted {{ color: {MUTED}; font-size: 0.9rem; line-height: 1.6; }}
+        .byline {{ color: {MUTED}; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.02em; }}
+        .demo-card {{
+            background: {CARD};
+            border: 1px solid {BORDER};
+            border-radius: 14px;
+            padding: 1.5rem;
+        }}
+        .prose {{
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            color: {TEXT_BODY};
+            border-left: 2px solid {ACCENT};
+            padding-left: 1.25rem;
+            margin: 0.5rem 0;
+        }}
+        .footer-card {{
+            background: {CARD};
+            border: 1px solid {BORDER};
+            border-radius: 14px;
+            padding: 1.75rem;
+            text-align: center;
+            margin-top: 2rem;
+        }}
+        .avatar {{
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, {PRIMARY}, {PRIMARY_DARK});
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Fraunces', serif;
+            font-size: 1.4rem;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+        }}
+        .footer-name {{
+            font-family: 'Fraunces', serif;
+            font-size: 1.1rem;
+            color: {TEXT};
+            margin-bottom: 0.25rem;
+        }}
+        .footer-bio {{ color: {MUTED}; font-size: 0.9rem; margin-bottom: 1rem; }}
+        .footer-links a {{
+            color: {PRIMARY};
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin: 0 0.6rem;
+        }}
+        .footer-links a:hover {{ text-decoration: underline; }}
+        .copyright {{ color: {MUTED}; font-size: 0.78rem; margin-top: 1rem; }}
+        section[data-testid="stSidebar"] {{ display: none; }}
+        .stApp {{ background: {BG}; }}
+        .block-container {{ max-width: 760px; padding-top: 2rem; }}
         </style>
         """,
         unsafe_allow_html=True,
@@ -126,8 +197,8 @@ def load_model() -> tuple[EMG1DCNN | None, dict, dict, dict]:
 def plot_signal(window: np.ndarray) -> plt.Figure:
     n_t, n_c = window.shape
     with plt.rc_context(PLOT_STYLE):
-        fig, ax = plt.subplots(figsize=(7.2, 3.8))
-        t = np.arange(n_t) * 1000 / 100 # ms
+        fig, ax = plt.subplots(figsize=(7.0, 3.6))
+        t = np.arange(n_t) * 1000 / 100
         offsets = np.arange(n_c) * 0.55
         colors = [CHANNEL_CMAP(i / max(n_c - 1, 1)) for i in range(n_c)]
         for c in range(n_c):
@@ -143,20 +214,24 @@ def plot_signal(window: np.ndarray) -> plt.Figure:
 
 def plot_top5(top_probs: np.ndarray, top_names: list[str], correct_idx: int | None) -> plt.Figure:
     with plt.rc_context(PLOT_STYLE):
-        fig, ax = plt.subplots(figsize=(7.2, 3.0))
+        fig, ax = plt.subplots(figsize=(7.0, 2.8))
         colors = [PRIMARY] * len(top_probs)
         if correct_idx is not None:
             colors[correct_idx] = ACCENT
-        ax.barh(range(len(top_probs)), top_probs[::-1], color=colors[::-1], height=0.65)
+        ax.barh(range(len(top_probs)), top_probs[::-1], color=colors[::-1], height=0.62)
         ax.set_yticks(range(len(top_probs)))
         ax.set_yticklabels(top_names[::-1])
         ax.set_xlim(0, 1)
         ax.set_xlabel("probability")
         for i, p in enumerate(top_probs[::-1]):
-            ax.text(p + 0.012, i, f"{p:.1%}", va="center", fontsize=9, color=TEXT)
+            ax.text(p + 0.012, i, f"{p:.1%}", va="center", fontsize=9, color=TEXT,
+                    family="JetBrains Mono")
         ax.spines["bottom"].set_visible(False)
         ax.tick_params(axis="x", length=0, labelbottom=False)
         ax.tick_params(axis="y", length=0)
+        if correct_idx is not None:
+            ax.text(1.0, -0.9, "true label", color=ACCENT, fontsize=8.5,
+                    ha="right", va="center", family="JetBrains Mono")
         fig.tight_layout()
     return fig
 
@@ -177,89 +252,37 @@ def true_class_from_filename(name: str) -> int | None:
     return int(m.group(1)) if m else None
 
 
-def render_sidebar(comparison: dict) -> None:
-    with st.sidebar:
-        st.markdown("##### Model card")
-        st.markdown(
-            '<span class="small-muted">A 1D convolutional network trained on '
-            "NinaPro DB1, a public sEMG gesture dataset.</span>",
-            unsafe_allow_html=True,
-        )
-        st.markdown("")
-
-        cnn = comparison.get("cnn_1d", {})
-        rf = comparison.get("random_forest", {})
-
-        c1, c2 = st.columns(2)
-        with c1:
-            st.metric("Subjects", "27")
-            st.metric("CNN params", "60k")
-            st.metric("CNN test acc",
-                      f"{cnn.get('accuracy', 0):.1%}" if cnn else "—")
-        with c2:
-            st.metric("Classes", "53")
-            st.metric("Train windows", "350k")
-            st.metric("RF test acc",
-                      f"{rf.get('accuracy', 0):.1%}" if rf else "—")
-
-        st.divider()
-        st.markdown("##### Honest take")
-        st.markdown(
-            '<span class="small-muted">The Random Forest baseline beats this '
-            "small CNN by 18 points. DB1's 100 Hz pre-rectified envelope leaves "
-            "little for a deep model to extract. A larger CNN with augmentation "
-            "is the v2 plan; see the README on GitHub for the full writeup."
-            "</span>",
-            unsafe_allow_html=True,
-        )
-        st.markdown("")
-        st.link_button(
-            "Repo on GitHub",
-            "https://github.com/johnnynguyen04/emg-gesture-classification",
-            use_container_width=True,
-        )
-
-
 def render_hero() -> None:
     st.markdown(
-        "<h1 style='margin-bottom: 0.25rem;'>EMG gesture classifier</h1>",
+        f"""
+        <div style="margin-bottom: 1.5rem;">
+            <h1 style="font-size: 2.4rem; margin: 0 0 0.5rem 0;">EMG hand gesture classifier</h1>
+            <div class="byline">by Johnny Nguyen · UCF Data Science · intern</div>
+        </div>
+        """,
         unsafe_allow_html=True,
     )
-    st.markdown(
-        '<p class="small-muted" style="margin-top:0; font-size: 1rem;">'
-        "Pick a 200 ms snapshot of forearm muscle activity. The model predicts "
-        "which of 53 hand gestures the person was performing."
-        "</p>",
-        unsafe_allow_html=True,
-    )
 
 
-def render_intro_expanders(labels: dict) -> None:
-    with st.expander("What are the 53 gestures?"):
-        groups = [
-            ("Rest (class 0)", [0]),
-            ("Basic finger movements · classes 1–12", list(range(1, 13))),
-            ("Hand configurations · classes 13–29", list(range(13, 30))),
-            ("Functional grasps · classes 30–52", list(range(30, 53))),
-        ]
-        for title, ids in groups:
-            st.markdown(f"**{title}**")
-            st.markdown("\n".join(f"- `{i}` · {labels.get(i, '?')}" for i in ids))
-
-    with st.expander("How to read this page"):
-        st.markdown(
-            "- **Input signal**: ten traces, one per forearm electrode, stacked "
-            "vertically. NinaPro DB1 uses Otto Bock electrodes that rectify and "
-            "smooth the signal in hardware, so it looks calmer than raw EMG.\n"
-            "- **Prediction**: the gesture the model is betting on, with its "
-            "confidence and which group it belongs to.\n"
-            "- **Top-5**: the model's five most likely guesses with probability. "
-            "Low max probability means the model knows it is unsure. The bar in "
-            "green (if any) marks the true label."
-        )
+def render_stats(comparison: dict) -> None:
+    cnn = comparison.get("cnn_1d", {})
+    rf = comparison.get("random_forest", {})
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Subjects", "27")
+    c2.metric("Gestures", "53")
+    c3.metric("Windows trained", "350k")
+    st.markdown("&nbsp;", unsafe_allow_html=True)
+    c4, c5, c6 = st.columns(3)
+    c4.metric("RF test acc",
+              f"{rf.get('accuracy', 0):.1%}" if rf else "—")
+    c5.metric("CNN test acc",
+              f"{cnn.get('accuracy', 0):.1%}" if cnn else "—")
+    c6.metric("Delta", f"{(cnn.get('accuracy', 0) - rf.get('accuracy', 0)):+.1%}"
+              if cnn and rf else "—")
 
 
 def render_demo(model, stats, labels) -> None:
+    st.markdown("### Live classification")
     samples = sorted(SAMPLES_DIR.glob("*.npy")) if SAMPLES_DIR.exists() else []
 
     source = st.radio(
@@ -306,23 +329,33 @@ def render_demo(model, stats, labels) -> None:
     pred_id = int(top_idx[0])
     pred_name = top_names[0]
 
-    st.markdown("&nbsp;", unsafe_allow_html=True)
     sig_col, pred_col = st.columns([1.6, 1], gap="large")
     with sig_col:
-        st.markdown("**Input signal**")
+        st.markdown(f'<div style="color:{MUTED}; font-size: 0.75rem; '
+                    f'text-transform: uppercase; letter-spacing: 0.08em; '
+                    f'font-weight: 500;">Signal trace</div>',
+                    unsafe_allow_html=True)
         st.pyplot(plot_signal(window), use_container_width=True)
     with pred_col:
-        st.markdown("**Prediction**")
+        st.markdown(f'<div style="color:{MUTED}; font-size: 0.75rem; '
+                    f'text-transform: uppercase; letter-spacing: 0.08em; '
+                    f'font-weight: 500; margin-bottom: 0.4rem;">Prediction</div>',
+                    unsafe_allow_html=True)
         st.markdown(
-            f"<div style='font-size: 1.4rem; font-weight: 600; color: {TEXT}; "
-            f"line-height: 1.15; margin: 0.25rem 0 0.5rem 0;'>{pred_name}</div>",
+            f'<div style="font-family: \'Fraunces\', serif; font-size: 1.5rem; '
+            f'font-weight: 500; color: {TEXT}; line-height: 1.15; '
+            f'margin-bottom: 0.5rem;">{pred_name}</div>',
             unsafe_allow_html=True,
         )
-        m1, m2 = st.columns(2)
-        m1.metric("Confidence", f"{top_probs[0]:.1%}")
-        m2.metric("Class id", str(pred_id))
         st.markdown(
-            f'<span class="small-muted">Group · {gesture_group(pred_id)}</span>',
+            f'<div style="font-family: \'JetBrains Mono\', monospace; '
+            f'font-size: 1.1rem; color: {PRIMARY}; margin-bottom: 0.25rem;">'
+            f'{top_probs[0]:.1%} confidence</div>',
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            f'<div class="small-muted">group · {gesture_group(pred_id)}<br>'
+            f'class id · {pred_id}</div>',
             unsafe_allow_html=True,
         )
 
@@ -342,25 +375,94 @@ def render_demo(model, stats, labels) -> None:
                     f"{probs[true_id]:.1%}, not in top 5."
                 )
 
-    st.markdown("**Top 5 guesses**")
+    st.markdown("&nbsp;", unsafe_allow_html=True)
+    st.markdown("### Top 5 predictions")
     correct_pos = None
     if true_id is not None and true_id in top_idx.tolist():
         correct_pos = top_idx.tolist().index(true_id)
     st.pyplot(plot_top5(top_probs, top_names, correct_pos), use_container_width=True)
 
 
+def render_expanders(labels: dict) -> None:
+    with st.expander("What are the 53 gestures?"):
+        groups = [
+            ("Rest (class 0)", [0]),
+            ("Basic finger movements · classes 1–12", list(range(1, 13))),
+            ("Hand configurations · classes 13–29", list(range(13, 30))),
+            ("Functional grasps · classes 30–52", list(range(30, 53))),
+        ]
+        for title, ids in groups:
+            st.markdown(f"**{title}**")
+            st.markdown("\n".join(f"- `{i}` · {labels.get(i, '?')}" for i in ids))
+
+    with st.expander("How to read this page"):
+        st.markdown(
+            "- **Signal trace**: ten lines, one per forearm electrode, stacked "
+            "vertically. NinaPro DB1 uses Otto Bock electrodes that rectify and "
+            "smooth the signal in hardware, so it looks calmer than raw EMG.\n"
+            "- **Prediction**: the gesture the model is betting on, with its "
+            "confidence and which group it belongs to.\n"
+            "- **Top 5**: the model's five most likely guesses with probability. "
+            "Low max probability means the model knows it is unsure. The green "
+            "bar marks the true label when it is in the top 5."
+        )
+
+
+def render_why() -> None:
+    st.markdown("### Why I built this")
+    st.markdown(
+        '<div class="prose">'
+        "I built this as a biosignal project. EMG-driven gesture recognition "
+        "is the same family of problem clinical systems try to solve, and "
+        "that overlap is what drew me to it. So I wanted to build a project "
+        "that overlapped with that work end to end: load the raw signals, "
+        "preprocess them properly, train two classifiers worth comparing, and "
+        "write up where each one wins."
+        "</div>",
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        '<div class="prose" style="margin-top: 1rem;">'
+        "I picked NinaPro DB1 over the newer DB2 or DB5 because DB1 has 53 "
+        "gesture classes and uses the same kind of pre-rectified EMG envelope "
+        " electrodes produce. The honest result of this run: my "
+        "small CNN underperformed the Random Forest baseline by 18 points. "
+        "The README on GitHub walks through why and what I would do "
+        "differently next time."
+        "</div>",
+        unsafe_allow_html=True,
+    )
+
+
+def render_footer() -> None:
+    st.markdown(
+        f"""
+        <div class="footer-card">
+            <div class="avatar">JN</div>
+            <div class="footer-name">Johnny Nguyen</div>
+            <div class="footer-bio">UCF Data Science, class of 2027 · intern</div>
+            <div class="footer-links">
+                <a href="{GITHUB_URL}" target="_blank">GitHub</a>
+                <a href="https://www.linkedin.com" target="_blank">LinkedIn</a>
+                <a href="mailto:johnny060904@gmail.com">Email</a>
+            </div>
+            <div class="copyright">© 2026 Johnny Nguyen · EMG gesture classifier</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def main() -> None:
     st.set_page_config(
-        page_title="EMG gesture classifier",
+        page_title="EMG hand gesture classifier",
         page_icon=None,
         layout="centered",
-        initial_sidebar_state="expanded",
+        initial_sidebar_state="collapsed",
     )
     inject_css()
 
     model, stats, labels, comparison = load_model()
-    render_sidebar(comparison)
-
     if model is None:
         st.warning(
             f"No trained model found at `{CHECKPOINT.relative_to(ROOT)}`. "
@@ -369,9 +471,14 @@ def main() -> None:
         st.stop()
 
     render_hero()
+    render_stats(comparison)
+    st.markdown("&nbsp;", unsafe_allow_html=True)
     render_demo(model, stats, labels)
-    st.divider()
-    render_intro_expanders(labels)
+    st.markdown("&nbsp;", unsafe_allow_html=True)
+    render_expanders(labels)
+    st.markdown("&nbsp;", unsafe_allow_html=True)
+    render_why()
+    render_footer()
 
 
 if __name__ == "__main__":
