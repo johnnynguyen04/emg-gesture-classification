@@ -104,21 +104,22 @@ def inject_css() -> None:
         .stApp {{
             background:
                 radial-gradient(120% 95% at 50% 0%,
-                    #ffffff 22%,
-                    rgba(31, 165, 219, 0.15) 48%,
-                    rgba(123, 192, 67, 0.11) 62%,
-                    rgba(31, 165, 219, 0.22) 80%,
-                    rgba(27, 54, 93, 0.16) 100%
+                    #ffffff 25%,
+                    rgba(31, 165, 219, 0.07) 50%,
+                    rgba(123, 192, 67, 0.05) 65%,
+                    rgba(31, 165, 219, 0.11) 82%,
+                    rgba(27, 54, 93, 0.08) 100%
                 );
             background-attachment: fixed;
             background-size: 100% 100%;
             font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
             color: {TEXT_BODY};
-            animation: bgBreathe 9s ease-in-out infinite;
+            animation: bgBreathe 7s ease-in-out infinite;
         }}
         @keyframes bgBreathe {{
-            0%, 100% {{ background-size: 100% 100%; background-position: 50% 0%; }}
-            50% {{ background-size: 118% 118%; background-position: 50% 5%; }}
+            0% {{ background-size: 100% 100%; background-position: 50% 0%; }}
+            50% {{ background-size: 138% 138%; background-position: 35% 10%; }}
+            100% {{ background-size: 100% 100%; background-position: 50% 0%; }}
         }}
         .stApp h1, .stApp h2 {{
             font-family: 'Manrope', sans-serif;
@@ -204,10 +205,10 @@ def inject_css() -> None:
             color: {PRIMARY_DARK};
         }}
         .hero-stat-unit {{
-            font-size: 0.7em;
-            font-weight: 600;
-            color: {PRIMARY};
-            margin-left: 0.05em;
+            font-size: 0.55em;
+            font-weight: 500;
+            color: {MUTED};
+            margin-left: 0.06em;
         }}
         .hero-stat-label {{
             font-family: 'JetBrains Mono', monospace;
@@ -218,14 +219,32 @@ def inject_css() -> None:
             margin-top: 0.4rem;
             font-weight: 500;
         }}
+        .side-stack {{
+            position: relative;
+            min-height: 260px;
+        }}
         .side-card {{
-            background: rgba(255, 255, 255, 0.65);
+            background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(18px) saturate(170%);
             -webkit-backdrop-filter: blur(18px) saturate(170%);
             border: 1px solid rgba(31, 165, 219, 0.18);
             border-radius: 14px;
             padding: 1.25rem 1.4rem;
             box-shadow: 0 4px 24px -8px rgba(27, 54, 93, 0.18);
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            opacity: 0;
+            animation: cardCycle 18s linear infinite;
+        }}
+        .side-card:nth-of-type(1) {{ animation-delay: 0s; }}
+        .side-card:nth-of-type(2) {{ animation-delay: 6s; }}
+        .side-card:nth-of-type(3) {{ animation-delay: 12s; }}
+        @keyframes cardCycle {{
+            0% {{ opacity: 0; transform: translateY(6px); }}
+            3% {{ opacity: 1; transform: translateY(0); }}
+            30% {{ opacity: 1; transform: translateY(0); }}
+            33% {{ opacity: 0; transform: translateY(-6px); }}
+            100% {{ opacity: 0; transform: translateY(-6px); }}
         }}
         .side-card-label {{
             font-family: 'JetBrains Mono', monospace;
@@ -583,6 +602,7 @@ def inject_css() -> None:
             z-index: 100;
             display: flex;
             align-items: center;
+            justify-content: flex-end;
             gap: 0.4rem;
             padding: 0.7rem 1rem;
             margin: -2.5rem -1rem 1.5rem -1rem;
@@ -919,18 +939,33 @@ def render_hero(comparison: dict, labels: dict) -> None:
                 </a>
             </div>
             <div class="hero-side">
-                <div class="side-card">
-                    <div class="side-card-label">
-                        <span class="side-dot"></span>Sample · Preview
+                <div class="side-stack">
+                    <div class="side-card">
+                        <div class="side-card-label"><span class="side-dot"></span>Sample · Preview</div>
+                        <div class="side-card-sub">Predicted gesture for class 5</div>
+                        <div class="side-card-name">{labels.get(5, 'Ring flexion')}</div>
+                        <div class="side-card-confidence">
+                            <span class="side-card-conf-num">64.3</span><span class="side-card-conf-unit">%</span>
+                        </div>
+                        <div class="side-card-meta"><span>CONFIDENCE</span><span>BASIC FINGER MOVEMENT</span></div>
                     </div>
-                    <div class="side-card-sub">Predicted gesture for class {sample_cls}</div>
-                    <div class="side-card-name">{sample_name}</div>
-                    <div class="side-card-confidence">
-                        <span class="side-card-conf-num">{sample_conf:.1f}</span><span class="side-card-conf-unit">%</span>
+                    <div class="side-card">
+                        <div class="side-card-label"><span class="side-dot"></span>Sample · Preview</div>
+                        <div class="side-card-sub">Predicted gesture for class 25</div>
+                        <div class="side-card-name">{labels.get(25, 'Wrist flexion')}</div>
+                        <div class="side-card-confidence">
+                            <span class="side-card-conf-num">16.3</span><span class="side-card-conf-unit">%</span>
+                        </div>
+                        <div class="side-card-meta"><span>CONFIDENCE</span><span>HAND CONFIGURATION</span></div>
                     </div>
-                    <div class="side-card-meta">
-                        <span>CONFIDENCE</span>
-                        <span>BASIC FINGER MOVEMENT</span>
+                    <div class="side-card">
+                        <div class="side-card-label"><span class="side-dot"></span>Sample · Preview</div>
+                        <div class="side-card-sub">Predicted gesture for class 42</div>
+                        <div class="side-card-name">{labels.get(42, 'Tripod grasp')}</div>
+                        <div class="side-card-confidence">
+                            <span class="side-card-conf-num">12.5</span><span class="side-card-conf-unit">%</span>
+                        </div>
+                        <div class="side-card-meta"><span>CONFIDENCE</span><span>FUNCTIONAL GRASP</span></div>
                     </div>
                 </div>
             </div>
