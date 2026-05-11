@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import io
 import json
-import math
 import re
 import sys
 from pathlib import Path
@@ -72,44 +71,6 @@ def gesture_group(class_id: int) -> str:
     return "functional grasp"
 
 
-def hero_decoration_svg() -> str:
-    """Decorative SVG: 8 stylized EMG channel traces fading in from right.
-    Path-drawing animation runs once on first load."""
-    width, height = 640, 220
-    n_channels = 8
-    points = 90
-    paths = []
-    for ch in range(n_channels):
-        y_base = 22 + ch * (height - 44) / (n_channels - 1)
-        freq = 0.022 + 0.006 * (ch % 3)
-        phase = ch * 0.85
-        amp = 7 + 1.5 * ((ch + 1) % 3)
-        d_parts = []
-        for i in range(points):
-            x = width * i / (points - 1)
-            y = (
-                y_base
-                + amp * math.sin(freq * x + phase)
-                + amp * 0.35 * math.sin(freq * 2.4 * x + phase * 1.3)
-            )
-            cmd = "M" if i == 0 else "L"
-            d_parts.append(f"{cmd}{x:.1f},{y:.1f}")
-        opacity = 0.10 + 0.04 * (ch / max(n_channels - 1, 1))
-        paths.append(
-            f'<path class="hero-channel hero-ch-{ch}" '
-            f'd="{" ".join(d_parts)}" '
-            f'stroke="{PRIMARY}" stroke-width="1.2" fill="none" '
-            f'stroke-linecap="round" opacity="{opacity:.2f}"/>'
-        )
-    return (
-        f'<svg viewBox="0 0 {width} {height}" preserveAspectRatio="xMaxYMid meet" '
-        f'xmlns="http://www.w3.org/2000/svg" aria-hidden="true" '
-        f'style="position:absolute; top:-20px; right:-30px; width:62%; '
-        f'max-width:540px; min-width:280px; height:auto; pointer-events:none; '
-        f'z-index:0; mask-image: linear-gradient(to left, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 100%); '
-        f'-webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 100%);">'
-        f'{"".join(paths)}</svg>'
-    )
 
 
 def inject_css() -> None:
@@ -250,35 +211,6 @@ def inject_css() -> None:
             box-shadow: 0 6px 18px rgba(14, 127, 184, 0.08);
         }}
 
-        /* Hero container holds the decorative waveform behind the title */
-        .hero-wrap {{
-            position: relative;
-            min-height: 130px;
-            margin-bottom: 1.75rem;
-            overflow: hidden;
-        }}
-        .hero-wrap h1, .hero-wrap .byline {{
-            position: relative;
-            z-index: 1;
-        }}
-
-        /* SVG path-drawing animation on first paint */
-        .hero-channel {{
-            stroke-dasharray: 1400;
-            stroke-dashoffset: 1400;
-            animation: drawLine 1.6s cubic-bezier(0.65, 0, 0.35, 1) forwards;
-        }}
-        .hero-ch-0 {{ animation-delay: 0ms; }}
-        .hero-ch-1 {{ animation-delay: 80ms; }}
-        .hero-ch-2 {{ animation-delay: 160ms; }}
-        .hero-ch-3 {{ animation-delay: 240ms; }}
-        .hero-ch-4 {{ animation-delay: 320ms; }}
-        .hero-ch-5 {{ animation-delay: 400ms; }}
-        .hero-ch-6 {{ animation-delay: 480ms; }}
-        .hero-ch-7 {{ animation-delay: 560ms; }}
-        @keyframes drawLine {{
-            to {{ stroke-dashoffset: 0; }}
-        }}
         </style>
         """,
         unsafe_allow_html=True,
@@ -366,8 +298,7 @@ def true_class_from_filename(name: str) -> int | None:
 def render_hero() -> None:
     st.markdown(
         f"""
-        <div class="hero-wrap">
-            {hero_decoration_svg()}
+        <div style="margin-bottom: 1.75rem;">
             <h1 style="font-size: 2.5rem; margin: 0 0 0.5rem 0;">EMG hand gesture classifier</h1>
             <div class="byline">by Johnny Nguyen · UCF Data Science</div>
         </div>
