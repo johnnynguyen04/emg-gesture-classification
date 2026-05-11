@@ -141,13 +141,14 @@ def inject_css() -> None:
             font-weight: 500;
         }}
         .hero-card {{
-            background: radial-gradient(ellipse at top right, rgba(31, 165, 219, 0.10) 0%, rgba(123, 192, 67, 0.04) 35%, rgba(255, 255, 255, 0) 70%), {CARD};
+            background: radial-gradient(ellipse 130% 110% at 100% 0%, rgba(31, 165, 219, 0.13) 0%, rgba(123, 192, 67, 0.06) 50%, rgba(255, 255, 255, 0) 100%), {CARD};
             border: 1px solid {BORDER};
             border-radius: 16px;
             padding: 2.25rem 2rem 2rem 2rem;
             margin-bottom: 1.75rem;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 2px 10px rgba(27, 54, 93, 0.04);
         }}
         .hero-card::before {{
             content: "";
@@ -266,6 +267,102 @@ def inject_css() -> None:
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.08em;
+        }}
+
+        /* Section header decoration: colored vertical bar next to h3 */
+        .stApp h3 {{
+            position: relative;
+            padding-left: 1rem !important;
+            margin-top: 0.25rem !important;
+        }}
+        .stApp h3::before {{
+            content: "";
+            position: absolute;
+            left: 0; top: 0.18em;
+            width: 4px; height: 1em;
+            background: linear-gradient(180deg, {PRIMARY} 0%, {ACCENT} 100%);
+            border-radius: 2px;
+        }}
+
+        /* Expander styling: premium tinted card look */
+        [data-testid="stExpander"] {{
+            background: {CARD_TINT};
+            border: 1px solid {BORDER};
+            border-left: 3px solid {ACCENT};
+            border-radius: 10px;
+            margin-bottom: 0.6rem;
+            box-shadow: 0 1px 3px rgba(27, 54, 93, 0.03);
+            transition: box-shadow 0.18s ease, border-left-color 0.18s ease;
+        }}
+        [data-testid="stExpander"]:hover {{
+            box-shadow: 0 4px 12px rgba(27, 54, 93, 0.07);
+            border-left-color: {PRIMARY};
+        }}
+        [data-testid="stExpander"] summary,
+        [data-testid="stExpander"] details > summary {{
+            font-weight: 600 !important;
+            color: {PRIMARY_DARK} !important;
+            padding: 0.4rem 0 !important;
+        }}
+        [data-testid="stExpander"] details[open] {{
+            background: transparent;
+        }}
+
+        /* Radio buttons: chip-style premium */
+        .stRadio > div {{ gap: 0.5rem !important; }}
+        .stRadio label {{
+            background: {CARD};
+            border: 1.5px solid {BORDER};
+            padding: 0.45rem 1rem !important;
+            border-radius: 8px;
+            transition: all 0.18s ease;
+            cursor: pointer;
+        }}
+        .stRadio label:hover {{
+            border-color: {PRIMARY};
+            background: {CARD_TINT};
+            transform: translateY(-1px);
+        }}
+        .stRadio label[data-checked="true"] {{
+            border-color: {PRIMARY};
+            background: {CARD_TINT};
+        }}
+
+        /* Selectbox: subtle premium frame */
+        .stSelectbox [data-baseweb="select"] > div {{
+            border-radius: 8px !important;
+            border-color: {BORDER} !important;
+            background: {CARD} !important;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease;
+        }}
+        .stSelectbox [data-baseweb="select"] > div:hover {{
+            border-color: {PRIMARY} !important;
+        }}
+        .stSelectbox [data-baseweb="select"] > div:focus-within {{
+            border-color: {PRIMARY} !important;
+            box-shadow: 0 0 0 3px rgba(31, 165, 219, 0.12);
+        }}
+
+        /* File uploader */
+        [data-testid="stFileUploader"] section {{
+            background: {CARD_TINT};
+            border: 1.5px dashed {BORDER};
+            border-radius: 10px;
+        }}
+
+        /* Streamlit alert boxes: cleaner */
+        [data-testid="stAlert"] {{
+            border-radius: 10px;
+            border: 1px solid {BORDER};
+            padding: 0.85rem 1rem !important;
+        }}
+
+        /* Custom divider replacement (subtle gradient line) */
+        .gradient-divider {{
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, {BORDER} 20%, {BORDER} 80%, transparent 100%);
+            margin: 2rem 0;
+            border: none;
         }}
 
         /* Streamlit alerts */
