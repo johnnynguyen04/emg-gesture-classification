@@ -138,23 +138,26 @@ def inject_css() -> None:
         }}
         [data-testid="stMetricValue"] {{
             font-family: 'JetBrains Mono', monospace !important;
-            font-weight: 600;
+            font-weight: 500;
             color: {PRIMARY_DARK};
-            font-size: 1.75rem !important;
+            font-size: 2.6rem !important;
+            line-height: 1 !important;
+            letter-spacing: -0.03em;
         }}
         [data-testid="stMetricLabel"] {{
             font-size: 0.7rem !important;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.12em;
             color: {MUTED};
-            font-weight: 600;
+            font-weight: 500;
+            margin-top: 0.5rem;
         }}
         [data-testid="stMetric"] {{
-            background: {CARD};
-            border: 1px solid {BORDER};
-            border-radius: 10px;
-            padding: 1rem 1.25rem;
-            box-shadow: 0 1px 3px rgba(27, 54, 93, 0.03);
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0.5rem 0;
+            box-shadow: none;
         }}
         .stButton button, .stLinkButton a, .stDownloadButton button {{
             border-radius: 8px !important;
@@ -278,17 +281,26 @@ def inject_css() -> None:
             0%, 100% {{ box-shadow: 0 4px 14px rgba(31, 165, 219, 0.20); }}
             50% {{ box-shadow: 0 6px 22px rgba(31, 165, 219, 0.42); }}
         }}
-        img.avatar-photo {{
+        .avatar-wrap {{
             width: 72px;
             height: 72px;
             border-radius: 50%;
-            object-fit: cover;
-            object-position: center top;
+            overflow: hidden;
+            display: inline-block;
             margin-bottom: 0.85rem;
             box-shadow: 0 4px 14px rgba(31, 165, 219, 0.25);
             animation: avatarPulse 4s ease-in-out infinite;
-            display: inline-block;
             border: 3px solid {CARD};
+        }}
+        .avatar-wrap img {{
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Scale up and shift so the visible window sits in the upper-right
+               of the source photo. */
+            transform: scale(1.45) translate(-15%, 12%);
+            transform-origin: center;
+            display: block;
         }}
         .footer-name {{
             font-family: 'Manrope', sans-serif;
@@ -357,19 +369,20 @@ def inject_css() -> None:
             letter-spacing: 0.08em;
         }}
 
-        /* Section header decoration: colored vertical bar next to h3 */
-        .stApp h3 {{
-            position: relative;
-            padding-left: 1rem !important;
-            margin-top: 0.25rem !important;
+        /* Academic-style section numbering, like "§ 01 Live Classification" */
+        .sec-num {{
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7em;
+            font-weight: 500;
+            color: {MUTED};
+            letter-spacing: 0.05em;
+            margin-right: 0.85em;
+            vertical-align: 0.18em;
         }}
-        .stApp h3::before {{
-            content: "";
-            position: absolute;
-            left: 0; top: 0.18em;
-            width: 4px; height: 1em;
-            background: linear-gradient(180deg, {PRIMARY} 0%, {ACCENT} 100%);
-            border-radius: 2px;
+        .stApp h3 {{
+            margin-top: 2.5rem !important;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid {BORDER};
         }}
 
         /* Expander styling: premium tinted card look */
@@ -659,7 +672,7 @@ def render_stats(comparison: dict) -> None:
 
 
 def render_demo(model, stats, labels) -> None:
-    st.markdown("### Live Classification")
+    st.markdown('<h3><span class="sec-num">§ 01</span>Live Classification</h3>', unsafe_allow_html=True)
     samples = sorted(SAMPLES_DIR.glob("*.npy")) if SAMPLES_DIR.exists() else []
 
     source = st.radio(
@@ -748,7 +761,7 @@ def render_demo(model, stats, labels) -> None:
                 )
 
     st.markdown("&nbsp;", unsafe_allow_html=True)
-    st.markdown("### Top 5 Predictions")
+    st.markdown('<h3><span class="sec-num">§ 02</span>Top 5 Predictions</h3>', unsafe_allow_html=True)
     correct_pos = None
     if true_id is not None and true_id in top_idx.tolist():
         correct_pos = top_idx.tolist().index(true_id)
@@ -778,7 +791,7 @@ def plot_per_class(rows: list[dict], color: str) -> plt.Figure:
 
 
 def render_model_comparison(comparison: dict) -> None:
-    st.markdown("### Model Comparison")
+    st.markdown('<h3><span class="sec-num">§ 03</span>Model Comparison</h3>', unsafe_allow_html=True)
     st.markdown(
         '<div class="section-note">Random Forest on Hudgins time-domain '
         "features against a 1D CNN trained end to end on the same windows. "
@@ -844,7 +857,7 @@ def render_per_class(labels: dict) -> None:
     bottom = rows[:10]
     top = rows[-10:][::-1]
 
-    st.markdown("### Per-Class Performance")
+    st.markdown('<h3><span class="sec-num">§ 04</span>Per-Class Performance</h3>', unsafe_allow_html=True)
     st.markdown(
         '<div class="section-note">CNN F1 score per gesture on the held-out '
         "test set. Hardest classes cluster in functional grasps where "
@@ -865,7 +878,7 @@ def render_per_class(labels: dict) -> None:
 
 
 def render_methodology() -> None:
-    st.markdown("### Methodology")
+    st.markdown('<h3><span class="sec-num">§ 05</span>Methodology</h3>', unsafe_allow_html=True)
     st.markdown(
         '<div class="section-note">How this was built, four steps.</div>',
         unsafe_allow_html=True,
@@ -930,7 +943,7 @@ def render_expanders(labels: dict) -> None:
 
 
 def render_why() -> None:
-    st.markdown("### Why I built this")
+    st.markdown('<h3><span class="sec-num">§ 06</span>Why I built this</h3>', unsafe_allow_html=True)
     st.markdown(
         '<div class="prose">'
         "I wanted to take a biosignal project end to end: load raw EMG, "
@@ -957,7 +970,7 @@ def render_why() -> None:
 def render_footer() -> None:
     portrait = portrait_data_url()
     avatar = (
-        f'<img class="avatar-photo" src="{portrait}" alt="Johnny Nguyen" />'
+        f'<div class="avatar-wrap"><img src="{portrait}" alt="Johnny Nguyen" /></div>'
         if portrait else '<div class="avatar">JN</div>'
     )
     st.markdown(
