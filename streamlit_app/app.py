@@ -248,7 +248,7 @@ def inject_css() -> None:
         .footer-links a:hover {{ text-decoration: underline; }}
         .copyright {{ color: {MUTED}; font-size: 0.78rem; margin-top: 1rem; }}
         section[data-testid="stSidebar"] {{ display: none; }}
-        .block-container {{ max-width: 780px; padding-top: 2rem; }}
+        .block-container {{ max-width: 780px; padding-top: 4rem; }}
 
         .method-card {{
             background: {CARD};
