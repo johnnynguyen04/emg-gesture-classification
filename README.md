@@ -2,7 +2,7 @@
 
 Classifying 53 hand gestures from surface EMG (NinaPro DB1). Random Forest baseline + 1D CNN in PyTorch.
 
-I'm a Data Science major at UCF. I wanted to take a biosignal project end to end: load the signal, preprocess it, train two classifiers worth comparing, and write up where each one wins.
+I'm a Data Science major at UCF. I wanted to take a biosignal project end to end: load the raw signal, preprocess it properly, train two classifiers worth comparing, and write up where each one wins.
 
 ## What this is
 
@@ -72,7 +72,7 @@ The "CNN > classical features" story is real in EMG, but it depends on signal qu
 ## What's next
 
 - **Bigger CNN + augmentation.** Same dataset, ~500k params, window jitter and amplitude scaling. I want to see if the CNN can clear the RF baseline once given a fair shot at the problem.
-- **Cross-subject (leave-one-subject-out).** Within-subject is easy mode. Real clinical biosignal use has to generalize to a new person, and the literature shows accuracy drops 30+ points when you do that. Seeing that drop on my own pipeline, then trying per-subject normalization to claw some of it back, is the real test.
+- **Cross-subject (leave-one-subject-out).** Within-subject is easy mode. Real clinical use has to generalize to a person the model has never seen, and the literature shows accuracy drops 30+ points when you do that. Seeing that drop on my own pipeline, then trying per-subject normalization to claw some of it back, is the real test.
 - **Try DB2 or DB5.** Both are raw EMG at 2 kHz instead of a pre-rectified envelope at 100 Hz. The bandpass function in `src/preprocess.py` becomes useful again, and the CNN should have a much fairer shot.
 
 ## Tech stack
