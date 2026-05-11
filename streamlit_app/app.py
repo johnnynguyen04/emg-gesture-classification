@@ -507,6 +507,25 @@ def inject_css() -> None:
             animation-delay: 100ms;
         }}
 
+        /* Scroll-triggered reveal for content below the fold. Uses CSS view()
+           timeline (Chrome/Edge 115+, Safari 26+). Older browsers ignore
+           animation-timeline and the animation plays once on load instead —
+           still safe, just not scroll-driven. */
+        @keyframes scrollRise {{
+            from {{ opacity: 0; transform: translateY(40px); }}
+            to {{ opacity: 1; transform: translateY(0); }}
+        }}
+        [data-testid="stPyplotChart"],
+        [data-testid="stImage"],
+        [data-testid="stExpander"],
+        .method-card,
+        .prose,
+        .pred-reveal {{
+            animation: scrollRise linear both;
+            animation-timeline: view();
+            animation-range: entry 0% cover 28%;
+        }}
+
         /* Card hover lift */
         [data-testid="stMetric"] {{
             transition: transform 0.18s ease, box-shadow 0.18s ease;
