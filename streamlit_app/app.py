@@ -121,39 +121,31 @@ def inject_css() -> None:
             50% {{ background-size: 112% 112%; }}
         }}
         .stApp h1, .stApp h2 {{
-            font-family: 'Fraunces', Georgia, serif;
-            font-weight: 500;
-            letter-spacing: -0.02em;
+            font-family: 'Manrope', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.028em;
             color: {PRIMARY_DARK};
-            font-variation-settings: "opsz" 96;
         }}
         .stApp h1 {{
-            font-weight: 500;
-            font-size: 3.4rem !important;
+            font-weight: 800;
+            font-size: 2.9rem !important;
             line-height: 1.05 !important;
             color: {PRIMARY_DARK};
         }}
-        .stApp h1 em {{
-            font-style: italic;
-            font-weight: 400;
-            color: {PRIMARY};
-        }}
         .stApp h3 {{
-            font-family: 'Fraunces', Georgia, serif !important;
-            font-weight: 500;
-            font-size: 1.9rem !important;
+            font-family: 'Manrope', sans-serif !important;
+            font-weight: 700;
+            font-size: 1.65rem !important;
             color: {PRIMARY_DARK};
-            font-variation-settings: "opsz" 48;
-            letter-spacing: -0.015em;
+            letter-spacing: -0.02em;
         }}
         [data-testid="stMetricValue"] {{
-            font-family: 'Fraunces', Georgia, serif !important;
-            font-weight: 400;
+            font-family: 'Manrope', sans-serif !important;
+            font-weight: 700;
             color: {PRIMARY_DARK};
-            font-size: 4.2rem !important;
+            font-size: 3.2rem !important;
             line-height: 1 !important;
             letter-spacing: -0.04em;
-            font-variation-settings: "opsz" 144;
         }}
         [data-testid="stMetricLabel"] {{
             font-size: 0.7rem !important;
@@ -241,19 +233,38 @@ def inject_css() -> None:
         .glass-btn:hover .arrow {{ transform: translateX(2px); }}
 
         .hero-chip {{
-            display: inline-block;
-            font-family: 'Manrope', sans-serif;
+            display: block;
+            font-family: 'JetBrains Mono', monospace;
             font-size: 0.7rem;
-            font-weight: 700;
+            font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 0.12em;
+            letter-spacing: 0.18em;
             color: {PRIMARY};
-            background: rgba(31, 165, 219, 0.10);
-            border: 1px solid rgba(31, 165, 219, 0.25);
-            padding: 0.3rem 0.7rem;
-            border-radius: 999px;
-            margin-bottom: 0.9rem;
+            margin-bottom: 1rem;
         }}
+        .text-link {{
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: {PRIMARY_DARK};
+            text-decoration: none;
+            padding: 0.3rem 0;
+            border-bottom: 1.5px solid {PRIMARY};
+            transition: gap 0.25s ease, color 0.25s ease;
+        }}
+        .text-link:hover {{
+            color: {PRIMARY};
+            gap: 0.7rem;
+        }}
+        .text-link .arrow {{
+            font-size: 1.05rem;
+            line-height: 1;
+            transition: transform 0.25s ease;
+        }}
+        .text-link:hover .arrow {{ transform: translateX(2px); }}
         .prose {{
             font-family: 'Manrope', sans-serif;
             font-size: 1.02rem;
@@ -307,9 +318,9 @@ def inject_css() -> None:
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* Scale up and shift so the visible window sits in the upper-right
-               of the source photo. */
-            transform: scale(1.45) translate(-15%, 12%);
+            /* translate +X moves image RIGHT in wrapper, so face appears
+               LEFT in the visible circle. +Y moves image DOWN, face appears UP. */
+            transform: scale(1.55) translate(20%, 22%);
             transform-origin: center;
             display: block;
         }}
@@ -711,13 +722,13 @@ def render_hero() -> None:
         f"""
         <div class="hero-block">
             <div class="hero-chip">Machine Learning · Biosignals</div>
-            <h1 style="margin: 0 0 0.7rem 0;">Reading muscles to <em>read intent.</em></h1>
-            <div style="font-family: 'Fraunces', serif; font-size: 1.15rem; color: {TEXT_BODY}; line-height: 1.55; max-width: 56ch; margin-bottom: 1rem; font-style: italic;">
+            <h1 style="margin: 0 0 0.7rem 0;">EMG Hand Gesture Classifier</h1>
+            <div style="font-size: 1.05rem; color: {TEXT_BODY}; line-height: 1.55; max-width: 56ch; margin-bottom: 1.1rem;">
                 A study of 1.2 million surface-EMG windows from 27 subjects, classifying 53 hand gestures with a Random Forest baseline and a 1D CNN.
             </div>
-            <div class="byline" style="margin-bottom: 1.1rem;">by Johnny Nguyen · UCF Data Science</div>
-            <a href="{GITHUB_URL}" target="_blank" class="glass-btn">
-                View Source <span class="arrow">→</span>
+            <div class="byline" style="margin-bottom: 1.2rem;">by Johnny Nguyen · UCF Data Science</div>
+            <a href="{GITHUB_URL}" target="_blank" class="text-link">
+                View source on GitHub <span class="arrow">→</span>
             </a>
         </div>
         """,
