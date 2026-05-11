@@ -4,7 +4,6 @@ from __future__ import annotations
 import base64
 import io
 import json
-import math
 import re
 import sys
 from pathlib import Path
@@ -47,30 +46,6 @@ def portrait_data_url() -> str | None:
     return None
 
 
-@st.cache_resource
-def ribbon_paths() -> tuple[str, str]:
-    """Two smooth tileable ribbon paths (width 2400, viewBox y=0..400).
-    Second half mirrors the first so a translateX -50% loop is seamless."""
-    width = 2400
-    seg = width // 2 # tile every 1200 units
-    band_top = 140
-    band_bot = 260
-    amp = 55
-
-    def wave_y(x: int, base: int, phase: float) -> float:
-        return base - amp * (
-            0.65 * math.sin((x * 2 * math.pi / seg) + phase)
-            + 0.35 * math.sin((x * 4 * math.pi / seg) + phase * 1.6)
-        )
-
-    def build(top_base: int, bot_base: int, phase: float) -> str:
-        top = [(x, wave_y(x, top_base, phase)) for x in range(0, width + 1, 24)]
-        bot = [(x, wave_y(x, bot_base, phase) + 80) for x in range(width, -1, -24)]
-        pts = top + bot
-        return ("M" + f"{pts[0][0]},{pts[0][1]:.1f} "
-                + " ".join(f"L{x},{y:.1f}" for x, y in pts[1:]) + " Z")
-
-    return build(band_top, band_top, 0.0), build(band_top + 30, band_top + 30, math.pi * 0.55)
 
 PRIMARY = "#1FA5DB"
 PRIMARY_DARK = "#1B365D"
@@ -132,24 +107,6 @@ def inject_css() -> None:
             color: {TEXT_BODY};
             position: relative;
         }}
-        /* Flowing ribbon wave through the middle of the page */
-        .emg-bg {{
-            position: fixed;
-            top: 50%;
-            left: 0;
-            width: 200%;
-            height: 420px;
-            transform: translate3d(0, -50%, 0);
-            pointer-events: none;
-            z-index: 0;
-            animation: emgFlow 30s linear infinite;
-        }}
-        .emg-bg svg {{ width: 100%; height: 100%; display: block; }}
-        @keyframes emgFlow {{
-            0% {{ transform: translate3d(0, -50%, 0); }}
-            100% {{ transform: translate3d(-50%, -50%, 0); }}
-        }}
-        .stApp > * {{ position: relative; z-index: 1; }}
         .stApp h1, .stApp h2, .stApp h3, .stApp h4 {{
             font-family: 'Manrope', sans-serif;
             font-weight: 700;
@@ -927,20 +884,6 @@ def render_footer() -> None:
     )
 
 
-def render_emg_background() -> None:
-    p1, p2 = ribbon_paths()
-    st.markdown(
-        f"""
-        <div class="emg-bg" aria-hidden="true">
-            <svg viewBox="0 0 2400 400" preserveAspectRatio="none"
-                 xmlns="http://www.w3.org/2000/svg">
-                <path d="{p2}" fill="{PRIMARY}" opacity="0.045"/>
-                <path d="{p1}" fill="{PRIMARY}" opacity="0.075"/>
-            </svg>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
 
 
 def main() -> None:
@@ -960,7 +903,6 @@ def main() -> None:
         )
         st.stop()
 
-    render_emg_background()
     render_hero()
     render_stats(comparison)
     st.markdown("&nbsp;", unsafe_allow_html=True)
