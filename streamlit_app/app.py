@@ -102,9 +102,23 @@ def inject_css() -> None:
         @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
         .stApp {{
-            background: {BG};
+            background:
+                radial-gradient(125% 95% at 50% 0%,
+                    #ffffff 28%,
+                    rgba(31, 165, 219, 0.07) 50%,
+                    rgba(123, 192, 67, 0.05) 65%,
+                    rgba(31, 165, 219, 0.11) 82%,
+                    rgba(27, 54, 93, 0.07) 100%
+                );
+            background-attachment: fixed;
+            background-size: 100% 100%;
             font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
             color: {TEXT_BODY};
+            animation: bgBreathe 14s ease-in-out infinite;
+        }}
+        @keyframes bgBreathe {{
+            0%, 100% {{ background-size: 100% 100%; }}
+            50% {{ background-size: 112% 112%; }}
         }}
         .stApp h1, .stApp h2, .stApp h3, .stApp h4 {{
             font-family: 'Manrope', sans-serif;
