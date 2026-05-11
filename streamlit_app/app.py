@@ -103,22 +103,22 @@ def inject_css() -> None:
 
         .stApp {{
             background:
-                radial-gradient(125% 95% at 50% 0%,
-                    #ffffff 28%,
-                    rgba(31, 165, 219, 0.07) 50%,
-                    rgba(123, 192, 67, 0.05) 65%,
-                    rgba(31, 165, 219, 0.11) 82%,
-                    rgba(27, 54, 93, 0.07) 100%
+                radial-gradient(120% 95% at 50% 0%,
+                    #ffffff 22%,
+                    rgba(31, 165, 219, 0.15) 48%,
+                    rgba(123, 192, 67, 0.11) 62%,
+                    rgba(31, 165, 219, 0.22) 80%,
+                    rgba(27, 54, 93, 0.16) 100%
                 );
             background-attachment: fixed;
             background-size: 100% 100%;
             font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
             color: {TEXT_BODY};
-            animation: bgBreathe 14s ease-in-out infinite;
+            animation: bgBreathe 9s ease-in-out infinite;
         }}
         @keyframes bgBreathe {{
-            0%, 100% {{ background-size: 100% 100%; }}
-            50% {{ background-size: 112% 112%; }}
+            0%, 100% {{ background-size: 100% 100%; background-position: 50% 0%; }}
+            50% {{ background-size: 118% 118%; background-position: 50% 5%; }}
         }}
         .stApp h1, .stApp h2 {{
             font-family: 'Manrope', sans-serif;
@@ -179,6 +179,120 @@ def inject_css() -> None:
         .hero-block {{
             padding: 0.5rem 0 1.5rem 0;
             margin-bottom: 1rem;
+        }}
+        .hero-grid {{
+            display: grid;
+            grid-template-columns: 1.55fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }}
+        @media (max-width: 720px) {{
+            .hero-grid {{ grid-template-columns: 1fr; }}
+        }}
+        .hero-stats {{
+            display: flex;
+            gap: 2rem;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+        }}
+        .hero-stat-value {{
+            font-family: 'Manrope', sans-serif;
+            font-size: 3.4rem;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -0.045em;
+            color: {PRIMARY_DARK};
+        }}
+        .hero-stat-unit {{
+            font-size: 0.7em;
+            font-weight: 600;
+            color: {PRIMARY};
+            margin-left: 0.05em;
+        }}
+        .hero-stat-label {{
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: {MUTED};
+            margin-top: 0.4rem;
+            font-weight: 500;
+        }}
+        .side-card {{
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(18px) saturate(170%);
+            -webkit-backdrop-filter: blur(18px) saturate(170%);
+            border: 1px solid rgba(31, 165, 219, 0.18);
+            border-radius: 14px;
+            padding: 1.25rem 1.4rem;
+            box-shadow: 0 4px 24px -8px rgba(27, 54, 93, 0.18);
+        }}
+        .side-card-label {{
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: {ACCENT_DARK};
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }}
+        .side-dot {{
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: {ACCENT};
+            box-shadow: 0 0 0 0 rgba(123, 192, 67, 0.65);
+            animation: sideDotPulse 2s ease-out infinite;
+        }}
+        @keyframes sideDotPulse {{
+            0%, 100% {{ box-shadow: 0 0 0 0 rgba(123, 192, 67, 0.65); }}
+            70% {{ box-shadow: 0 0 0 8px rgba(123, 192, 67, 0); }}
+        }}
+        .side-card-sub {{
+            font-size: 0.78rem;
+            color: {MUTED};
+            margin-bottom: 0.4rem;
+        }}
+        .side-card-name {{
+            font-family: 'Manrope', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: {PRIMARY_DARK};
+            margin-bottom: 0.85rem;
+            letter-spacing: -0.015em;
+        }}
+        .side-card-confidence {{
+            display: flex;
+            align-items: baseline;
+            margin-bottom: 0.55rem;
+        }}
+        .side-card-conf-num {{
+            font-family: 'Manrope', sans-serif;
+            font-size: 3.2rem;
+            font-weight: 800;
+            color: {PRIMARY};
+            line-height: 1;
+            letter-spacing: -0.045em;
+        }}
+        .side-card-conf-unit {{
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: {PRIMARY};
+            margin-left: 0.15rem;
+        }}
+        .side-card-meta {{
+            display: flex;
+            justify-content: space-between;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.12em;
+            color: {MUTED};
+            padding-top: 0.7rem;
+            border-top: 1px solid {BORDER};
+            font-weight: 500;
         }}
         /* Apple-style liquid glass button (backdrop-blur + layered inset shadows).
            No SVG displacement — Chrome would show refraction, all browsers
@@ -273,9 +387,58 @@ def inject_css() -> None:
             background: linear-gradient(180deg, {CARD_TINT} 0%, {CARD} 100%);
             border: 1px solid {BORDER};
             border-radius: 14px;
-            padding: 2rem 1.75rem;
-            text-align: center;
-            margin-top: 2rem;
+            padding: 2.2rem 2rem 1.5rem 2rem;
+            text-align: left;
+            margin-top: 3rem;
+        }}
+        .footer-meta {{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5rem;
+            margin-bottom: 1.75rem;
+        }}
+        @media (max-width: 640px) {{
+            .footer-meta {{ grid-template-columns: 1fr; gap: 1.5rem; }}
+        }}
+        .meta-title {{
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            color: {PRIMARY};
+            margin-bottom: 0.85rem;
+            font-weight: 500;
+        }}
+        .meta-row {{
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid {BORDER};
+            font-size: 0.9rem;
+        }}
+        .meta-row:last-child {{ border-bottom: none; }}
+        .meta-key {{
+            color: {MUTED};
+            font-weight: 500;
+        }}
+        .meta-val {{
+            color: {PRIMARY_DARK};
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-align: right;
+        }}
+        .footer-bar {{
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 1rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid {BORDER};
+        }}
+        @media (max-width: 640px) {{
+            .footer-bar {{ flex-direction: column; align-items: flex-start; }}
         }}
         .avatar {{
             width: 64px;
@@ -320,21 +483,32 @@ def inject_css() -> None:
         }}
         .footer-name {{
             font-family: 'Manrope', sans-serif;
-            font-size: 1.2rem;
+            font-size: 1.05rem;
             color: {PRIMARY_DARK};
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.2rem;
             font-weight: 700;
         }}
-        .footer-bio {{ color: {MUTED}; font-size: 0.9rem; margin-bottom: 1rem; }}
+        .footer-bio {{ color: {MUTED}; font-size: 0.82rem; }}
+        .footer-links {{ display: flex; gap: 1.1rem; }}
         .footer-links a {{
             color: {PRIMARY};
             text-decoration: none;
-            font-size: 0.9rem;
-            margin: 0 0.6rem;
+            font-size: 0.85rem;
             font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
         }}
         .footer-links a:hover {{ text-decoration: underline; }}
-        .copyright {{ color: {MUTED}; font-size: 0.78rem; margin-top: 1rem; }}
+        .copyright {{
+            color: {MUTED};
+            font-size: 0.72rem;
+            margin-top: 1.25rem;
+            padding-top: 1rem;
+            border-top: 1px solid {BORDER};
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 0.04em;
+        }}
         section[data-testid="stSidebar"] {{ display: none; }}
         .block-container {{ max-width: 780px; padding-top: 4rem; }}
 
@@ -699,7 +873,6 @@ def render_nav() -> None:
     st.markdown(
         """
         <div class="top-nav">
-            <span class="brand">EMG Study</span>
             <a href="#classify">Classify</a>
             <a href="#compare">Compare</a>
             <a href="#perclass">Classes</a>
@@ -711,19 +884,56 @@ def render_nav() -> None:
     )
 
 
-def render_hero() -> None:
+def render_hero(comparison: dict, labels: dict) -> None:
+    cnn = comparison.get("cnn_1d", {})
+    sample_cls = 5
+    sample_name = labels.get(sample_cls, f"class_{sample_cls}")
+    sample_conf = 64.3
+
     st.markdown(
         f"""
-        <div class="hero-block">
-            <div class="hero-chip">Machine Learning · Biosignals</div>
-            <h1 style="margin: 0 0 0.7rem 0;">EMG Hand Gesture Classifier</h1>
-            <div style="font-size: 1.05rem; color: {TEXT_BODY}; line-height: 1.55; max-width: 56ch; margin-bottom: 1.1rem;">
-                A study of 1.2 million surface-EMG windows from 27 subjects, classifying 53 hand gestures with a Random Forest baseline and a 1D CNN.
+        <div class="hero-block hero-grid">
+            <div class="hero-left">
+                <div class="hero-chip">Machine Learning · Biosignals</div>
+                <h1 style="margin: 0 0 0.7rem 0;">EMG Hand Gesture Classifier</h1>
+                <div style="font-size: 1.05rem; color: {TEXT_BODY}; line-height: 1.55; max-width: 52ch; margin-bottom: 1.5rem;">
+                    A study of 1.2 million surface-EMG windows from 27 subjects, classifying 53 hand gestures with a Random Forest baseline and a 1D CNN.
+                </div>
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">1.2<span class="hero-stat-unit">M</span></div>
+                        <div class="hero-stat-label">Windows trained</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">27</div>
+                        <div class="hero-stat-label">Subjects</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">53</div>
+                        <div class="hero-stat-label">Gestures</div>
+                    </div>
+                </div>
+                <div class="byline" style="margin: 1.4rem 0 1.2rem 0;">by Johnny Nguyen · UCF Data Science</div>
+                <a href="{GITHUB_URL}" target="_blank" class="text-link">
+                    View source on GitHub <span class="arrow">→</span>
+                </a>
             </div>
-            <div class="byline" style="margin-bottom: 1.2rem;">by Johnny Nguyen · UCF Data Science</div>
-            <a href="{GITHUB_URL}" target="_blank" class="text-link">
-                View source on GitHub <span class="arrow">→</span>
-            </a>
+            <div class="hero-side">
+                <div class="side-card">
+                    <div class="side-card-label">
+                        <span class="side-dot"></span>Sample · Preview
+                    </div>
+                    <div class="side-card-sub">Predicted gesture for class {sample_cls}</div>
+                    <div class="side-card-name">{sample_name}</div>
+                    <div class="side-card-confidence">
+                        <span class="side-card-conf-num">{sample_conf:.1f}</span><span class="side-card-conf-unit">%</span>
+                    </div>
+                    <div class="side-card-meta">
+                        <span>CONFIDENCE</span>
+                        <span>BASIC FINGER MOVEMENT</span>
+                    </div>
+                </div>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -1043,20 +1253,56 @@ def render_why() -> None:
     )
 
 
-def render_footer() -> None:
-    avatar = '<div class="avatar">JN</div>'
+def render_footer(comparison: dict) -> None:
+    cnn = comparison.get("cnn_1d", {})
+    rf = comparison.get("random_forest", {})
+    rows = [
+        ("dataset", [
+            ("Source", "NinaPro DB1"),
+            ("Records", "1,201,994 windows"),
+            ("Subjects", "27"),
+            ("Gestures", "53"),
+            ("Channels", "10"),
+            ("Sampling", "100 Hz · Otto Bock"),
+        ]),
+        ("model", [
+            ("Architecture", "1D CNN (Conv1D ×3)"),
+            ("Parameters", "60,309"),
+            ("Test accuracy", f"{cnn.get('accuracy', 0):.1%}"),
+            ("Macro F1", f"{cnn.get('macro_f1', 0):.3f}"),
+            ("Baseline RF", f"{rf.get('accuracy', 0):.1%}"),
+            ("Train epochs", "30"),
+        ]),
+    ]
+
+    cols_html = ""
+    for title, items in rows:
+        rows_html = "".join(
+            f'<div class="meta-row"><span class="meta-key">{k}</span>'
+            f'<span class="meta-val">{v}</span></div>'
+            for k, v in items
+        )
+        cols_html += (
+            f'<div class="meta-col">'
+            f'<div class="meta-title">{title}</div>{rows_html}</div>'
+        )
+
     st.markdown(
         f"""
         <div class="footer-card">
-            {avatar}
-            <div class="footer-name">Johnny Nguyen</div>
-            <div class="footer-bio">UCF Data Science</div>
-            <div class="footer-links">
-                <a href="{GITHUB_URL}" target="_blank">GitHub</a>
-                <a href="https://www.linkedin.com/in/johnnynguyen04/" target="_blank">LinkedIn</a>
-                <a href="mailto:johnny060904@gmail.com">Email</a>
+            <div class="footer-meta">{cols_html}</div>
+            <div class="footer-bar">
+                <div>
+                    <div class="footer-name">EMG Hand Gesture Classifier</div>
+                    <div class="footer-bio">By Johnny Nguyen · UCF Data Science · Independent study</div>
+                </div>
+                <div class="footer-links">
+                    <a href="{GITHUB_URL}" target="_blank">GitHub</a>
+                    <a href="https://www.linkedin.com/in/johnnynguyen04/" target="_blank">LinkedIn</a>
+                    <a href="mailto:johnny060904@gmail.com">Email</a>
+                </div>
             </div>
-            <div class="copyright">© 2026 Johnny Nguyen · EMG Gesture Classifier</div>
+            <div class="copyright">© 2026 Johnny Nguyen. NinaPro DB1 dataset used under its terms (Atzori et al., 2014).</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -1083,8 +1329,7 @@ def main() -> None:
         st.stop()
 
     render_nav()
-    render_hero()
-    render_stats(comparison)
+    render_hero(comparison, labels)
     st.markdown("&nbsp;", unsafe_allow_html=True)
     render_demo(model, stats, labels)
     st.markdown("&nbsp;", unsafe_allow_html=True)
@@ -1097,7 +1342,7 @@ def main() -> None:
     render_expanders(labels)
     st.markdown("&nbsp;", unsafe_allow_html=True)
     render_why()
-    render_footer()
+    render_footer(comparison)
 
 
 if __name__ == "__main__":
