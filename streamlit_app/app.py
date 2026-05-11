@@ -139,7 +139,7 @@ def inject_css() -> None:
         [data-testid="stMetricValue"] {{
             font-family: 'JetBrains Mono', monospace !important;
             font-weight: 600;
-            color: {PRIMARY};
+            color: {PRIMARY_DARK};
             font-size: 1.75rem !important;
         }}
         [data-testid="stMetricLabel"] {{
@@ -152,10 +152,9 @@ def inject_css() -> None:
         [data-testid="stMetric"] {{
             background: {CARD};
             border: 1px solid {BORDER};
-            border-top: 3px solid {PRIMARY};
             border-radius: 10px;
             padding: 1rem 1.25rem;
-            box-shadow: 0 2px 6px rgba(27, 54, 93, 0.04);
+            box-shadow: 0 1px 3px rgba(27, 54, 93, 0.03);
         }}
         .stButton button, .stLinkButton a, .stDownloadButton button {{
             border-radius: 8px !important;
@@ -171,15 +170,9 @@ def inject_css() -> None:
             letter-spacing: 0.02em;
             font-weight: 500;
         }}
-        .hero-card {{
-            background: linear-gradient(135deg, {CARD} 0%, {CARD} 45%, rgba(123, 192, 67, 0.05) 75%, rgba(31, 165, 219, 0.12) 100%);
-            border: 1px solid {BORDER};
-            border-radius: 16px;
-            padding: 2.25rem 2rem 2rem 2rem;
-            margin-bottom: 1.75rem;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(27, 54, 93, 0.04);
+        .hero-block {{
+            padding: 0.5rem 0 1.5rem 0;
+            margin-bottom: 1rem;
         }}
         .hero-chip {{
             display: inline-block;
@@ -194,20 +187,6 @@ def inject_css() -> None:
             padding: 0.3rem 0.7rem;
             border-radius: 999px;
             margin-bottom: 0.9rem;
-        }}
-        .hero-card::before {{
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, {PRIMARY} 0%, {ACCENT} 35%, {PRIMARY} 70%, {ACCENT} 100%);
-            background-size: 220% 100%;
-            animation: gradientShift 14s ease-in-out infinite;
-        }}
-        @keyframes gradientShift {{
-            0% {{ background-position: 0% 50%; }}
-            50% {{ background-position: 100% 50%; }}
-            100% {{ background-position: 0% 50%; }}
         }}
         .prose {{
             font-family: 'Manrope', sans-serif;
@@ -452,7 +431,7 @@ def inject_css() -> None:
             from {{ opacity: 0; transform: translateY(16px); }}
             to {{ opacity: 1; transform: translateY(0); }}
         }}
-        .hero-card {{
+        .hero-block {{
             animation: riseIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) backwards;
         }}
         [data-testid="stMetric"] {{
@@ -578,7 +557,7 @@ def true_class_from_filename(name: str) -> int | None:
 def render_hero() -> None:
     st.markdown(
         f"""
-        <div class="hero-card">
+        <div class="hero-block">
             <div class="hero-chip">Machine Learning · Biosignals</div>
             <h1 style="margin: 0 0 0.55rem 0;">EMG Hand Gesture Classifier</h1>
             <div class="byline">by Johnny Nguyen · UCF Data Science</div>
