@@ -1,7 +1,6 @@
 """Streamlit demo: predict a hand gesture from a 200 ms × 10ch sEMG window."""
 from __future__ import annotations
 
-import base64
 import io
 import json
 import re
@@ -29,22 +28,7 @@ CNN_METRICS = ROOT / "results" / "metrics" / "cnn_metrics.json"
 RF_CONFUSION = ROOT / "results" / "figures" / "rf_confusion.png"
 CNN_CONFUSION = ROOT / "results" / "figures" / "cnn_confusion.png"
 SAMPLES_DIR = ROOT / "streamlit_app" / "samples"
-ASSETS_DIR = ROOT / "streamlit_app" / "assets"
 GITHUB_URL = "https://github.com/johnnynguyen04/emg-gesture-classification"
-
-
-@st.cache_resource
-def portrait_data_url() -> str | None:
-    if not ASSETS_DIR.exists():
-        return None
-    for ext in (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG"):
-        p = ASSETS_DIR / f"portrait{ext}"
-        if p.exists():
-            mime = "image/png" if p.suffix.lower() == ".png" else "image/jpeg"
-            data = base64.b64encode(p.read_bytes()).decode()
-            return f"data:{mime};base64,{data}"
-    return None
-
 
 
 PRIMARY = "#1FA5DB"
@@ -349,58 +333,6 @@ def inject_css() -> None:
             border-top: 1px solid {BORDER};
             font-weight: 500;
         }}
-        /* Apple-style liquid glass button (backdrop-blur + layered inset shadows).
-           No SVG displacement — Chrome would show refraction, all browsers
-           get clean frosted glass. */
-        .glass-btn {{
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            padding: 0.6rem 1.3rem;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.55);
-            backdrop-filter: blur(14px) saturate(170%);
-            -webkit-backdrop-filter: blur(14px) saturate(170%);
-            color: {PRIMARY_DARK};
-            font-weight: 600;
-            font-size: 0.9rem;
-            font-family: 'Manrope', sans-serif;
-            letter-spacing: -0.005em;
-            text-decoration: none;
-            transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1),
-                        box-shadow 280ms cubic-bezier(0.16, 1, 0.3, 1),
-                        background 280ms ease;
-            box-shadow:
-                inset 0 0 0 1px rgba(255, 255, 255, 0.45),
-                inset 1.5px 2.5px 0 -2px rgba(255, 255, 255, 0.85),
-                inset -2px -2px 0 -2px rgba(255, 255, 255, 0.7),
-                inset -0.5px -1px 3px 0 rgba(0, 0, 0, 0.10),
-                inset 0 2.5px 3.5px -2px rgba(0, 0, 0, 0.16),
-                0 1px 4px 0 rgba(27, 54, 93, 0.08),
-                0 5px 14px -2px rgba(27, 54, 93, 0.10);
-            cursor: pointer;
-        }}
-        .glass-btn:hover {{
-            transform: scale(1.04);
-            background: rgba(255, 255, 255, 0.7);
-            box-shadow:
-                inset 0 0 0 1px rgba(255, 255, 255, 0.55),
-                inset 1.5px 2.5px 0 -2px rgba(255, 255, 255, 0.95),
-                inset -2px -2px 0 -2px rgba(255, 255, 255, 0.85),
-                0 4px 16px -2px rgba(27, 54, 93, 0.18);
-        }}
-        .glass-btn:active {{ transform: scale(0.97); }}
-        .glass-btn-sm {{
-            padding: 0.4rem 0.95rem;
-            font-size: 0.82rem;
-        }}
-        .glass-btn .arrow {{
-            font-size: 1rem;
-            line-height: 1;
-            transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
-        }}
-        .glass-btn:hover .arrow {{ transform: translateX(2px); }}
-
         .hero-chip {{
             display: block;
             font-family: 'JetBrains Mono', monospace;
@@ -514,27 +446,6 @@ def inject_css() -> None:
         @keyframes avatarPulse {{
             0%, 100% {{ box-shadow: 0 4px 14px rgba(31, 165, 219, 0.20); }}
             50% {{ box-shadow: 0 6px 22px rgba(31, 165, 219, 0.42); }}
-        }}
-        .avatar-wrap {{
-            width: 72px;
-            height: 72px;
-            border-radius: 50%;
-            overflow: hidden;
-            display: inline-block;
-            margin-bottom: 0.85rem;
-            box-shadow: 0 4px 14px rgba(31, 165, 219, 0.25);
-            animation: avatarPulse 4s ease-in-out infinite;
-            border: 3px solid {CARD};
-        }}
-        .avatar-wrap img {{
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            /* translate +X moves image RIGHT in wrapper, so face appears
-               LEFT in the visible circle. +Y moves image DOWN, face appears UP. */
-            transform: scale(1.55) translate(20%, 22%);
-            transform-origin: center;
-            display: block;
         }}
         .footer-name {{
             font-family: 'Manrope', sans-serif;
@@ -1015,23 +926,6 @@ def render_hero(comparison: dict, labels: dict) -> None:
         """,
         unsafe_allow_html=True,
     )
-
-
-def render_stats(comparison: dict) -> None:
-    cnn = comparison.get("cnn_1d", {})
-    rf = comparison.get("random_forest", {})
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Subjects", "27")
-    c2.metric("Gestures", "53")
-    c3.metric("Windows trained", "350k")
-    st.markdown("&nbsp;", unsafe_allow_html=True)
-    c4, c5, c6 = st.columns(3)
-    c4.metric("RF test acc",
-              f"{rf.get('accuracy', 0):.1%}" if rf else "—")
-    c5.metric("CNN test acc",
-              f"{cnn.get('accuracy', 0):.1%}" if cnn else "—")
-    c6.metric("Delta", f"{(cnn.get('accuracy', 0) - rf.get('accuracy', 0)):+.1%}"
-              if cnn and rf else "—")
 
 
 def render_demo(model, stats, labels) -> None:
