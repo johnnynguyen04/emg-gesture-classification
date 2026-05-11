@@ -99,7 +99,7 @@ def inject_css() -> None:
     st.markdown(
         f"""
         <style>
-        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
         .stApp {{
             background:
@@ -120,29 +120,40 @@ def inject_css() -> None:
             0%, 100% {{ background-size: 100% 100%; }}
             50% {{ background-size: 112% 112%; }}
         }}
-        .stApp h1, .stApp h2, .stApp h3, .stApp h4 {{
-            font-family: 'Manrope', sans-serif;
-            font-weight: 700;
+        .stApp h1, .stApp h2 {{
+            font-family: 'Fraunces', Georgia, serif;
+            font-weight: 500;
             letter-spacing: -0.02em;
             color: {PRIMARY_DARK};
+            font-variation-settings: "opsz" 96;
         }}
         .stApp h1 {{
-            font-weight: 800;
-            font-size: 2.6rem !important;
+            font-weight: 500;
+            font-size: 3.4rem !important;
+            line-height: 1.05 !important;
             color: {PRIMARY_DARK};
+        }}
+        .stApp h1 em {{
+            font-style: italic;
+            font-weight: 400;
+            color: {PRIMARY};
         }}
         .stApp h3 {{
-            font-weight: 700;
-            font-size: 1.4rem !important;
+            font-family: 'Fraunces', Georgia, serif !important;
+            font-weight: 500;
+            font-size: 1.9rem !important;
             color: {PRIMARY_DARK};
+            font-variation-settings: "opsz" 48;
+            letter-spacing: -0.015em;
         }}
         [data-testid="stMetricValue"] {{
-            font-family: 'JetBrains Mono', monospace !important;
-            font-weight: 500;
+            font-family: 'Fraunces', Georgia, serif !important;
+            font-weight: 400;
             color: {PRIMARY_DARK};
-            font-size: 2.6rem !important;
+            font-size: 4.2rem !important;
             line-height: 1 !important;
-            letter-spacing: -0.03em;
+            letter-spacing: -0.04em;
+            font-variation-settings: "opsz" 144;
         }}
         [data-testid="stMetricLabel"] {{
             font-size: 0.7rem !important;
@@ -369,20 +380,61 @@ def inject_css() -> None:
             letter-spacing: 0.08em;
         }}
 
-        /* Academic-style section numbering, like "§ 01 Live Classification" */
+        /* WDW-style section labels: small mono uppercase before serif title */
         .sec-num {{
+            display: block;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7em;
+            font-size: 0.72rem;
             font-weight: 500;
-            color: {MUTED};
-            letter-spacing: 0.05em;
-            margin-right: 0.85em;
-            vertical-align: 0.18em;
+            color: {PRIMARY};
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            margin: 2.5rem 0 0.6rem 0;
         }}
         .stApp h3 {{
-            margin-top: 2.5rem !important;
-            padding-bottom: 0.5rem;
+            margin-top: 0 !important;
+            padding-bottom: 1rem;
             border-bottom: 1px solid {BORDER};
+        }}
+
+        /* Sticky top nav with glass-blur backdrop */
+        .top-nav {{
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.7rem 1rem;
+            margin: -2.5rem -1rem 1.5rem -1rem;
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(18px) saturate(180%);
+            -webkit-backdrop-filter: blur(18px) saturate(180%);
+            border-bottom: 1px solid {BORDER};
+        }}
+        .top-nav .brand {{
+            font-family: 'Fraunces', serif;
+            font-weight: 500;
+            color: {PRIMARY_DARK};
+            font-size: 0.95rem;
+            margin-right: auto;
+            padding-left: 0.3rem;
+        }}
+        .top-nav a {{
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: {MUTED};
+            text-decoration: none;
+            padding: 0.4rem 0.75rem;
+            border-radius: 999px;
+            transition: color 200ms ease, background 200ms ease;
+            font-weight: 500;
+        }}
+        .top-nav a:hover {{
+            color: {PRIMARY_DARK};
+            background: rgba(31, 165, 219, 0.08);
         }}
 
         /* Expander styling: premium tinted card look */
@@ -638,12 +690,31 @@ def true_class_from_filename(name: str) -> int | None:
     return int(m.group(1)) if m else None
 
 
+def render_nav() -> None:
+    st.markdown(
+        """
+        <div class="top-nav">
+            <span class="brand">EMG Study</span>
+            <a href="#classify">Classify</a>
+            <a href="#compare">Compare</a>
+            <a href="#perclass">Classes</a>
+            <a href="#method">Method</a>
+            <a href="#why">Why</a>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def render_hero() -> None:
     st.markdown(
         f"""
         <div class="hero-block">
             <div class="hero-chip">Machine Learning · Biosignals</div>
-            <h1 style="margin: 0 0 0.55rem 0;">EMG Hand Gesture Classifier</h1>
+            <h1 style="margin: 0 0 0.7rem 0;">Reading muscles to <em>read intent.</em></h1>
+            <div style="font-family: 'Fraunces', serif; font-size: 1.15rem; color: {TEXT_BODY}; line-height: 1.55; max-width: 56ch; margin-bottom: 1rem; font-style: italic;">
+                A study of 1.2 million surface-EMG windows from 27 subjects, classifying 53 hand gestures with a Random Forest baseline and a 1D CNN.
+            </div>
             <div class="byline" style="margin-bottom: 1.1rem;">by Johnny Nguyen · UCF Data Science</div>
             <a href="{GITHUB_URL}" target="_blank" class="glass-btn">
                 View Source <span class="arrow">→</span>
@@ -672,7 +743,7 @@ def render_stats(comparison: dict) -> None:
 
 
 def render_demo(model, stats, labels) -> None:
-    st.markdown('<h3><span class="sec-num">§ 01</span>Live Classification</h3>', unsafe_allow_html=True)
+    st.markdown('<span class="sec-num" id="classify">§ 01 — Try the model</span><h3>Live Classification</h3>', unsafe_allow_html=True)
     samples = sorted(SAMPLES_DIR.glob("*.npy")) if SAMPLES_DIR.exists() else []
 
     source = st.radio(
@@ -761,7 +832,7 @@ def render_demo(model, stats, labels) -> None:
                 )
 
     st.markdown("&nbsp;", unsafe_allow_html=True)
-    st.markdown('<h3><span class="sec-num">§ 02</span>Top 5 Predictions</h3>', unsafe_allow_html=True)
+    st.markdown('<span class="sec-num">§ 02 — Ranked confidence</span><h3>Top 5 Predictions</h3>', unsafe_allow_html=True)
     correct_pos = None
     if true_id is not None and true_id in top_idx.tolist():
         correct_pos = top_idx.tolist().index(true_id)
@@ -791,7 +862,7 @@ def plot_per_class(rows: list[dict], color: str) -> plt.Figure:
 
 
 def render_model_comparison(comparison: dict) -> None:
-    st.markdown('<h3><span class="sec-num">§ 03</span>Model Comparison</h3>', unsafe_allow_html=True)
+    st.markdown('<span class="sec-num" id="compare">§ 03 — Head to head</span><h3>Model Comparison</h3>', unsafe_allow_html=True)
     st.markdown(
         '<div class="section-note">Random Forest on Hudgins time-domain '
         "features against a 1D CNN trained end to end on the same windows. "
@@ -857,7 +928,7 @@ def render_per_class(labels: dict) -> None:
     bottom = rows[:10]
     top = rows[-10:][::-1]
 
-    st.markdown('<h3><span class="sec-num">§ 04</span>Per-Class Performance</h3>', unsafe_allow_html=True)
+    st.markdown('<span class="sec-num" id="perclass">§ 04 — Where the model breaks</span><h3>Per-Class Performance</h3>', unsafe_allow_html=True)
     st.markdown(
         '<div class="section-note">CNN F1 score per gesture on the held-out '
         "test set. Hardest classes cluster in functional grasps where "
@@ -878,7 +949,7 @@ def render_per_class(labels: dict) -> None:
 
 
 def render_methodology() -> None:
-    st.markdown('<h3><span class="sec-num">§ 05</span>Methodology</h3>', unsafe_allow_html=True)
+    st.markdown('<span class="sec-num" id="method">§ 05 — How it works</span><h3>Methodology</h3>', unsafe_allow_html=True)
     st.markdown(
         '<div class="section-note">How this was built, four steps.</div>',
         unsafe_allow_html=True,
@@ -943,7 +1014,7 @@ def render_expanders(labels: dict) -> None:
 
 
 def render_why() -> None:
-    st.markdown('<h3><span class="sec-num">§ 06</span>Why I built this</h3>', unsafe_allow_html=True)
+    st.markdown('<span class="sec-num" id="why">§ 06 — Context</span><h3>Why I built this</h3>', unsafe_allow_html=True)
     st.markdown(
         '<div class="prose">'
         "I wanted to take a biosignal project end to end: load raw EMG, "
@@ -1010,6 +1081,7 @@ def main() -> None:
         )
         st.stop()
 
+    render_nav()
     render_hero()
     render_stats(comparison)
     st.markdown("&nbsp;", unsafe_allow_html=True)
