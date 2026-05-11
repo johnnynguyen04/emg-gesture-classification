@@ -888,7 +888,7 @@ def render_footer() -> None:
 
 def main() -> None:
     st.set_page_config(
-        page_title="EMG hand gesture classifier",
+        page_title="EMG Hand Gesture Classifier",
         page_icon=None,
         layout="centered",
         initial_sidebar_state="collapsed",
