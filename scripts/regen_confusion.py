@@ -30,19 +30,19 @@ METRICS = ROOT / "results" / "metrics"
 FIGS = ROOT / "results" / "figures"
 
 # Match the Streamlit demo palette.
-PRIMARY = "#0e7fb8"
-TEXT = "#0f172a"
-MUTED = "#64748b"
-BG = "#ffffff"
-BORDER = "#e2e8f0"
+PRIMARY = "#1ba8e1"
+TEXT = "#0c2d42"
+MUTED = "#6e8296"
+BG = "#fcfdfe"
+BORDER = "#dce7ef"
 
 BLUE_CMAP = LinearSegmentedColormap.from_list(
-    "demo_blue", ["#ffffff", "#dbeafe", "#93c5e8", PRIMARY, "#0a4a70"]
+    "demo_blue", ["#fcfdfe", "#e0f2fb", "#8bd0ef", PRIMARY, "#005c95"]
 )
 
 PLOT_STYLE = {
     "font.family": "sans-serif",
-    "font.sans-serif": ["Inter Tight", "Inter", "Helvetica", "Arial", "sans-serif"],
+    "font.sans-serif": ["Plus Jakarta Sans", "Segoe UI", "Arial", "sans-serif"],
     "axes.edgecolor": BORDER,
     "axes.labelcolor": MUTED,
     "axes.titlesize": 11,
