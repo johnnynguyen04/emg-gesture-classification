@@ -14,6 +14,7 @@ data/processed/*
 
 # pipeline run logs
 results/pipeline_run.log
+results/regen.log
 
 # default-ignore model checkpoints except the published CNN one
 *.pth

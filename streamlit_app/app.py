@@ -31,31 +31,39 @@ SAMPLES_DIR = ROOT / "streamlit_app" / "samples"
 GITHUB_URL = "https://github.com/johnnynguyen04/emg-gesture-classification"
 
 
-PRIMARY = "#1FA5DB"
-PRIMARY_DARK = "#1B365D"
-ACCENT = "#7BC043"
-ACCENT_DARK = "#2A5D43"
-TEXT = "#0F1F35"
-TEXT_BODY = "#3A4B61"
-MUTED = "#6B7A8F"
-BORDER = "#dde4ed"
-BG = "#ffffff"
+# Palette, taken from the AdventHealth logo spectrum: deep blue, sky blue,
+# lime green, deep teal. The chart steps pass the CVD-separation and
+# lightness checks against a white surface.
+BLUE = "#005C95"
+SKY = "#1BA8E1"
+GREEN = "#82C342"
+CHART_BLUE = "#1787C0"
+CHART_GREEN = "#82C342"
+INK = "#0C2D42"
+BODY = "#3D5468"
+MUTED = "#6E8296"
+BORDER = "#DCE7EF"
+BG = "#FCFDFE"
 CARD = "#ffffff"
-CARD_TINT = "#f4f8fc"
+TINT = "#F1F7FA"
+
+# Channels sweep the brand spectrum, deep blue through sky to green. The
+# green endpoint is a darker step than the logo lime so thin lines stay
+# readable on the light surface.
 CHANNEL_CMAP = LinearSegmentedColormap.from_list(
-    "channels", ["#a5d6ed", "#1FA5DB", "#0F4B70"]
+    "channels", [BLUE, SKY, "#6CAB34"]
 )
 
 PLOT_STYLE = {
     "font.family": "sans-serif",
-    "font.sans-serif": ["Manrope", "Inter", "Helvetica", "Arial", "sans-serif"],
+    "font.sans-serif": ["Plus Jakarta Sans", "Segoe UI", "Arial", "sans-serif"],
     "axes.edgecolor": BORDER,
     "axes.labelcolor": MUTED,
     "axes.spines.top": False,
     "axes.spines.right": False,
     "axes.titlesize": 11,
     "axes.titleweight": "regular",
-    "axes.titlecolor": TEXT,
+    "axes.titlecolor": INK,
     "xtick.color": MUTED,
     "ytick.color": MUTED,
     "xtick.labelsize": 9,
@@ -77,306 +85,457 @@ def gesture_group(class_id: int) -> str:
     return "functional grasp"
 
 
-
-
 def inject_css() -> None:
     st.markdown(
         f"""
         <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
         html {{ scroll-behavior: smooth; }}
-        .sec-num {{ scroll-margin-top: 130px; }}
+        .sec-num {{ scroll-margin-top: 90px; }}
 
+        /* Static layered washes: blue from the top, a faint purple from the
+           right edge. No animation — the page holds still. */
         .stApp {{
             background:
-                radial-gradient(120% 95% at 50% 0%,
-                    #ffffff 26%,
-                    rgba(31, 165, 219, 0.09) 48%,
-                    rgba(123, 192, 67, 0.06) 64%,
-                    rgba(31, 165, 219, 0.14) 80%,
-                    rgba(27, 54, 93, 0.10) 100%
-                );
+                radial-gradient(90rem 42rem at 12% -8%, rgba(0, 92, 149, 0.1), transparent 60%),
+                radial-gradient(50rem 30rem at 85% -6%, rgba(27, 168, 225, 0.09), transparent 55%),
+                radial-gradient(70rem 46rem at 108% 24%, rgba(130, 195, 66, 0.07), transparent 55%),
+                {BG};
             background-attachment: fixed;
-            background-size: 100% 100%;
-            font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
-            color: {TEXT_BODY};
-            animation: bgBreathe 10s ease-in-out infinite;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: {BODY};
         }}
-        @keyframes bgBreathe {{
-            0% {{ background-size: 100% 100%; background-position: 50% 0%; }}
-            50% {{ background-size: 114% 114%; background-position: 44% 6%; }}
-            100% {{ background-size: 100% 100%; background-position: 50% 0%; }}
-        }}
-        .stApp h1, .stApp h2 {{
-            font-family: 'Manrope', sans-serif;
-            font-weight: 700;
-            letter-spacing: -0.028em;
-            color: {PRIMARY_DARK};
-        }}
+
+        .block-container {{ max-width: 1060px; padding-top: 2.5rem; }}
+        section[data-testid="stSidebar"] {{ display: none; }}
+        header[data-testid="stHeader"] {{ display: none; }}
+
+        /* ------------------------------------------------------ type */
         .stApp h1 {{
-            font-weight: 800;
-            font-size: 2.9rem !important;
-            line-height: 1.05 !important;
-            color: {PRIMARY_DARK};
+            font-family: 'Fraunces', serif;
+            font-weight: 550;
+            font-size: 3.6rem !important;
+            line-height: 1.04 !important;
+            letter-spacing: -0.015em;
+            color: {INK};
         }}
         .stApp h3 {{
-            font-family: 'Manrope', sans-serif !important;
-            font-weight: 700;
-            font-size: 1.65rem !important;
-            color: {PRIMARY_DARK};
-            letter-spacing: -0.02em;
+            font-family: 'Fraunces', serif !important;
+            font-weight: 500;
+            font-size: 1.8rem !important;
+            letter-spacing: -0.008em;
+            color: {INK};
+            margin-top: 0 !important;
+            padding-bottom: 0.9rem;
+            border-bottom: 2px solid;
+            border-image: linear-gradient(90deg, {SKY}, {BORDER} 45%, transparent) 1;
         }}
+        .small-muted {{ color: {MUTED}; font-size: 0.9rem; line-height: 1.6; }}
+
+        /* --------------------------------------------------- metrics */
         [data-testid="stMetricValue"] {{
-            font-family: 'Manrope', sans-serif !important;
-            font-weight: 700;
-            color: {PRIMARY_DARK};
-            font-size: 3.2rem !important;
-            line-height: 1 !important;
-            letter-spacing: -0.04em;
+            font-family: 'Fraunces', serif !important;
+            font-weight: 500;
+            font-variant-numeric: tabular-nums;
+            color: {BLUE};
+            font-size: 2.7rem !important;
+            line-height: 1.05 !important;
         }}
         [data-testid="stMetricLabel"] {{
-            font-size: 0.7rem !important;
+            font-size: 0.68rem !important;
             text-transform: uppercase;
-            letter-spacing: 0.12em;
+            letter-spacing: 0.14em;
             color: {MUTED};
-            font-weight: 500;
-            margin-top: 0.5rem;
+            font-weight: 600;
         }}
         [data-testid="stMetric"] {{
-            background: transparent;
-            border: none;
-            border-radius: 0;
-            padding: 0.5rem 0;
-            box-shadow: none;
-        }}
-        .stButton button, .stLinkButton a, .stDownloadButton button {{
-            border-radius: 8px !important;
-            border: 1px solid {BORDER} !important;
-            font-weight: 600 !important;
-        }}
-        hr {{ border-color: {BORDER}; }}
-        .small-muted {{ color: {MUTED}; font-size: 0.9rem; line-height: 1.6; }}
-        .byline {{
-            color: {MUTED};
-            font-size: 0.9rem;
-            font-family: 'JetBrains Mono', monospace;
-            letter-spacing: 0.02em;
-            font-weight: 500;
-        }}
-        .hero-block {{
-            padding: 0.5rem 0 1.5rem 0;
-            margin-bottom: 1rem;
-        }}
-        .hero-grid {{
-            display: grid;
-            grid-template-columns: 1.55fr 1fr;
-            gap: 2rem;
-            align-items: start;
-        }}
-        @media (max-width: 720px) {{
-            .hero-grid {{ grid-template-columns: 1fr; }}
-        }}
-        .hero-stats {{
-            display: flex;
-            gap: 2rem;
-            margin-top: 0.5rem;
-            flex-wrap: wrap;
-        }}
-        .hero-stat-value {{
-            font-family: 'Manrope', sans-serif;
-            font-size: 3.4rem;
-            font-weight: 800;
-            line-height: 1;
-            letter-spacing: -0.045em;
-            color: {PRIMARY_DARK};
-        }}
-        .hero-stat-unit {{
-            font-size: 0.55em;
-            font-weight: 700;
-            color: {PRIMARY_DARK};
-            margin-left: 0.05em;
-        }}
-        .hero-stat-label {{
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            color: {MUTED};
-            margin-top: 0.4rem;
-            font-weight: 500;
-        }}
-        .side-stack {{
-            position: relative;
-            min-height: 240px;
-            margin-bottom: 1rem;
-        }}
-        .model-card {{
-            background: rgba(255, 255, 255, 0.55);
-            backdrop-filter: blur(14px) saturate(160%);
-            -webkit-backdrop-filter: blur(14px) saturate(160%);
+            background: {CARD};
             border: 1px solid {BORDER};
-            border-radius: 12px;
-            padding: 1rem 1.2rem;
+            border-radius: 16px;
+            padding: 1.1rem 1.3rem 1rem 1.3rem;
+            box-shadow: 0 18px 40px -32px rgba(0, 92, 149, 0.35);
+            position: relative;
+            overflow: hidden;
         }}
-        .model-card-label {{
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.65rem;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            color: {PRIMARY};
-            margin-bottom: 0.6rem;
-        }}
-        .model-card-row {{
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            padding: 0.35rem 0;
-            border-bottom: 1px solid {BORDER};
-            font-size: 0.78rem;
-        }}
-        .model-card-row:last-child {{ border-bottom: none; }}
-        .model-card-row span:first-child {{ color: {MUTED}; }}
-        .model-card-row span:last-child {{
-            color: {PRIMARY_DARK};
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 500;
-        }}
-        .side-card {{
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(18px) saturate(170%);
-            -webkit-backdrop-filter: blur(18px) saturate(170%);
-            border: 1px solid rgba(31, 165, 219, 0.18);
-            border-radius: 14px;
-            padding: 1.25rem 1.4rem;
-            box-shadow: 0 4px 24px -8px rgba(27, 54, 93, 0.18);
+        [data-testid="stMetric"]::before {{
+            content: "";
             position: absolute;
             top: 0; left: 0; right: 0;
-            opacity: 0;
-            animation: cardCycle 18s linear infinite;
+            height: 3px;
+            background: linear-gradient(90deg, {BLUE}, {SKY} 55%, {GREEN});
         }}
-        .side-card:nth-of-type(1) {{ animation-delay: 0s; }}
-        .side-card:nth-of-type(2) {{ animation-delay: 6s; }}
-        .side-card:nth-of-type(3) {{ animation-delay: 12s; }}
-        @keyframes cardCycle {{
-            0% {{ opacity: 0; transform: translateY(6px); }}
-            3% {{ opacity: 1; transform: translateY(0); }}
-            30% {{ opacity: 1; transform: translateY(0); }}
-            33% {{ opacity: 0; transform: translateY(-6px); }}
-            100% {{ opacity: 0; transform: translateY(-6px); }}
+
+        /* ------------------------------------------------ nav pill */
+        .top-nav {{
+            position: sticky;
+            top: 0.9rem;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+            width: fit-content;
+            margin: -1rem auto 2rem auto;
+            padding: 0.45rem 0.6rem;
+            background: rgba(255, 255, 255, 0.78);
+            backdrop-filter: blur(16px) saturate(160%);
+            -webkit-backdrop-filter: blur(16px) saturate(160%);
+            border: 1px solid rgba(0, 92, 149, 0.10);
+            border-radius: 999px;
+            box-shadow: 0 12px 32px -18px rgba(0, 92, 149, 0.35);
         }}
-        .side-card-label {{
+        .top-nav .brand {{
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            font-family: 'Fraunces', serif;
+            font-weight: 550;
+            font-size: 0.92rem;
+            color: {INK};
+            padding: 0 0.9rem 0 0.7rem;
+        }}
+        .top-nav a {{
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: {MUTED};
+            text-decoration: none;
+            padding: 0.42rem 0.85rem;
+            border-radius: 999px;
+            transition: color 0.4s cubic-bezier(0.32, 0.72, 0, 1),
+                        background 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+        }}
+        .top-nav a:hover {{
+            color: {BLUE};
+            background: rgba(0, 92, 149, 0.07);
+        }}
+
+        /* ---------------------------------------------------- hero */
+        .hero-block {{ padding: 1.5rem 0 0 0; }}
+        .hero-grid {{
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 3.5rem;
+            align-items: center;
+        }}
+        @media (max-width: 760px) {{
+            .hero-grid {{ grid-template-columns: 1fr; gap: 2rem; }}
+        }}
+        .hero-eyebrow {{
+            display: block;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.65rem;
+            font-size: 0.68rem;
             font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 0.15em;
-            color: {ACCENT_DARK};
+            letter-spacing: 0.16em;
+            color: {MUTED};
+            margin-bottom: 1.2rem;
+        }}
+        .hero-sub {{
+            font-size: 1.08rem;
+            color: {BODY};
+            line-height: 1.65;
+            max-width: 50ch;
+            margin: 1.1rem 0 2rem 0;
+        }}
+        .hero-stats {{ display: flex; gap: 2.75rem; flex-wrap: wrap; }}
+        .hero-stat-value {{
+            font-family: 'Fraunces', serif;
+            font-size: 3.1rem;
+            font-weight: 500;
+            line-height: 1;
+            background: linear-gradient(135deg, {BLUE} 20%, {SKY});
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: {BLUE};
+        }}
+        .hero-stat-value .unit {{ font-size: 0.55em; }}
+        .hero-stat-label {{
+            font-size: 0.66rem;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: {MUTED};
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }}
+        .byline {{ color: {MUTED}; font-size: 0.88rem; margin: 1.6rem 0 1.1rem 0; }}
+
+        .text-link {{
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: {BLUE} !important;
+            text-decoration: none !important;
+        }}
+        .text-link .arrow {{
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.7rem;
+            height: 1.7rem;
+            border-radius: 999px;
+            background: rgba(0, 92, 149, 0.08);
+            font-size: 0.9rem;
+            transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1),
+                        background 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+        }}
+        .text-link:hover .arrow {{
+            transform: translateX(3px);
+            background: rgba(0, 92, 149, 0.14);
+        }}
+
+        /* Hero card: an outer tinted shell holding a white inner card, so it
+           reads as one physical object rather than a floating rectangle. */
+        .bezel {{
+            background: linear-gradient(155deg, rgba(0, 92, 149, 0.08), rgba(27, 168, 225, 0.08), rgba(130, 195, 66, 0.07));
+            border: 1px solid rgba(0, 92, 149, 0.12);
+            border-radius: 24px;
+            padding: 8px;
+            box-shadow: 0 30px 60px -30px rgba(0, 92, 149, 0.35);
+            animation: cardFloat 7s cubic-bezier(0.42, 0, 0.58, 1) infinite;
+        }}
+        @keyframes cardFloat {{
+            0%, 100% {{ transform: translateY(0); }}
+            50% {{ transform: translateY(-7px); }}
+        }}
+        .bezel-core {{
+            background: {CARD};
+            border-radius: 17px;
+            padding: 1.5rem 1.6rem;
+        }}
+        .live-label {{
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            margin-bottom: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.62rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: {BLUE};
+            margin-bottom: 0.9rem;
         }}
-        .side-dot {{
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: {ACCENT};
-            box-shadow: 0 0 0 0 rgba(123, 192, 67, 0.65);
-            animation: sideDotPulse 2s ease-out infinite;
+        .live-dot {{
+            width: 6px; height: 6px; border-radius: 50%;
+            background: {GREEN};
+            animation: dotBreathe 2.6s ease-in-out infinite;
         }}
-        @keyframes sideDotPulse {{
-            0%, 100% {{ box-shadow: 0 0 0 0 rgba(123, 192, 67, 0.65); }}
-            70% {{ box-shadow: 0 0 0 8px rgba(123, 192, 67, 0); }}
+        @keyframes dotBreathe {{
+            0%, 100% {{ box-shadow: 0 0 0 0 rgba(130, 195, 66, 0.5); }}
+            55% {{ box-shadow: 0 0 0 6px rgba(130, 195, 66, 0); }}
         }}
-        .side-card-sub {{
-            font-size: 0.78rem;
-            color: {MUTED};
-            margin-bottom: 0.4rem;
+        .pred-name {{
+            font-family: 'Fraunces', serif;
+            font-size: 1.5rem;
+            font-weight: 550;
+            color: {INK};
+            margin-bottom: 0.8rem;
+            line-height: 1.15;
         }}
-        .side-card-name {{
-            font-family: 'Manrope', sans-serif;
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: {PRIMARY_DARK};
-            margin-bottom: 0.85rem;
-            letter-spacing: -0.015em;
-        }}
-        .side-card-confidence {{
-            display: flex;
-            align-items: baseline;
-            margin-bottom: 0.55rem;
-        }}
-        .side-card-conf-num {{
-            font-family: 'Manrope', sans-serif;
-            font-size: 3.2rem;
-            font-weight: 800;
-            color: {PRIMARY};
+        .pred-conf {{
+            font-family: 'Fraunces', serif;
+            font-size: 3.4rem;
+            font-weight: 500;
+            color: {BLUE};
             line-height: 1;
-            letter-spacing: -0.045em;
         }}
-        .side-card-conf-unit {{
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: {PRIMARY};
-            margin-left: 0.15rem;
-        }}
-        .side-card-meta {{
+        .pred-conf .unit {{ font-size: 0.42em; margin-left: 0.1em; }}
+        .pred-meta {{
             display: flex;
             justify-content: space-between;
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.6rem;
-            letter-spacing: 0.12em;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
             color: {MUTED};
-            padding-top: 0.7rem;
+            padding-top: 0.9rem;
+            margin-top: 1.1rem;
             border-top: 1px solid {BORDER};
-            font-weight: 500;
         }}
-        .hero-chip {{
+        .spec-rows {{ margin-top: 1rem; }}
+        .spec-row {{
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 0.38rem 0.35rem;
+            font-size: 0.8rem;
+        }}
+        .spec-row span:first-child {{ color: {MUTED}; }}
+        .spec-row span:last-child {{
+            color: {INK};
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+        }}
+
+        /* Flowy divider between the hero and the working sections. The svg
+           is wider than its box and drifts slowly side to side. */
+        .wave-sep {{ margin: 2.5rem -1rem 1.5rem -1rem; line-height: 0; overflow: hidden; }}
+        .wave-sep svg {{
+            width: 120%;
+            margin-left: -10%;
+            height: 54px;
+            display: block;
+            animation: waveDrift 16s cubic-bezier(0.42, 0, 0.58, 1) infinite alternate;
+        }}
+        @keyframes waveDrift {{
+            from {{ transform: translateX(-3.5%); }}
+            to {{ transform: translateX(3.5%); }}
+        }}
+
+        /* ------------------------------------------------- sections */
+        .sec-num {{
             display: block;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             font-weight: 500;
-            text-transform: uppercase;
+            color: {BLUE};
             letter-spacing: 0.18em;
-            color: {PRIMARY};
-            margin-bottom: 1rem;
+            text-transform: uppercase;
+            margin: 3.5rem 0 0.6rem 0;
         }}
-        .text-link {{
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-family: 'Manrope', sans-serif;
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: {PRIMARY} !important;
-            text-decoration: none !important;
-            border: none !important;
-            transition: gap 0.25s ease;
+        .section-note {{
+            color: {MUTED};
+            font-size: 0.94rem;
+            line-height: 1.65;
+            margin: 0.25rem 0 1.5rem 0;
+            max-width: 64ch;
         }}
-        .text-link:hover {{ gap: 0.8rem; }}
-        .text-link .arrow {{
-            font-size: 1.05rem;
-            line-height: 1;
+        .cm-label {{
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: {INK};
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 0.4rem;
         }}
         .prose {{
-            font-family: 'Manrope', sans-serif;
-            font-size: 1.02rem;
-            line-height: 1.7;
-            color: {TEXT_BODY};
-            border-left: 3px solid {ACCENT};
-            padding-left: 1.25rem;
+            font-size: 1.03rem;
+            line-height: 1.75;
+            color: {BODY};
+            border-left: 3px solid;
+            border-image: linear-gradient(180deg, {SKY}, {GREEN}) 1;
+            padding-left: 1.3rem;
             margin: 0.5rem 0;
-            font-weight: 400;
+            max-width: 66ch;
         }}
-        .footer-card {{
-            background: linear-gradient(180deg, {CARD_TINT} 0%, {CARD} 100%);
+
+        .method-card {{
+            background: {CARD};
             border: 1px solid {BORDER};
+            border-radius: 16px;
+            padding: 1.4rem 1.5rem;
+            margin-bottom: 1rem;
+            height: 100%;
+            box-shadow: 0 18px 40px -32px rgba(0, 92, 149, 0.35);
+            transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1),
+                        box-shadow 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+        }}
+        .method-card:hover {{
+            transform: translateY(-4px);
+            box-shadow: 0 26px 48px -30px rgba(0, 92, 149, 0.5);
+        }}
+        .method-title {{
+            font-family: 'Fraunces', serif;
+            font-size: 1.05rem;
+            font-weight: 550;
+            color: {INK};
+            margin-bottom: 0.5rem;
+        }}
+        .method-num {{
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.8rem;
+            height: 1.8rem;
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(0, 92, 149, 0.1), rgba(27, 168, 225, 0.12));
+            color: {BLUE};
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.7rem;
+        }}
+        .method-body {{ font-size: 0.92rem; color: {BODY}; line-height: 1.65; }}
+
+        /* ------------------------------------------------- widgets */
+        .stButton button, .stLinkButton a, .stDownloadButton button {{
+            border-radius: 999px !important;
+            border: 1px solid {BORDER} !important;
+            font-weight: 600 !important;
+            transition: border-color 0.4s cubic-bezier(0.32, 0.72, 0, 1),
+                        box-shadow 0.4s cubic-bezier(0.32, 0.72, 0, 1) !important;
+        }}
+        .stButton button:hover {{
+            border-color: {BLUE} !important;
+            box-shadow: 0 6px 18px -8px rgba(0, 92, 149, 0.4) !important;
+        }}
+        .stButton button:active {{ transform: scale(0.98); }}
+
+        .stRadio > div {{ gap: 0.5rem !important; }}
+        .stRadio label {{
+            background: {CARD};
+            border: 1px solid {BORDER};
+            padding: 0.45rem 1.05rem !important;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: border-color 0.4s cubic-bezier(0.32, 0.72, 0, 1),
+                        background 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+        }}
+        .stRadio label:hover {{ border-color: {BLUE}; background: {TINT}; }}
+        .stRadio label[data-checked="true"] {{ border-color: {BLUE}; background: {TINT}; }}
+
+        .stSelectbox [data-baseweb="select"] > div {{
+            border-radius: 12px !important;
+            border-color: {BORDER} !important;
+            background: {CARD} !important;
+            transition: border-color 0.4s cubic-bezier(0.32, 0.72, 0, 1),
+                        box-shadow 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+        }}
+        .stSelectbox [data-baseweb="select"] > div:hover {{ border-color: {BLUE} !important; }}
+        .stSelectbox [data-baseweb="select"] > div:focus-within {{
+            border-color: {BLUE} !important;
+            box-shadow: 0 0 0 3px rgba(0, 92, 149, 0.12);
+        }}
+
+        [data-testid="stFileUploader"] section {{
+            background: {TINT};
+            border: 1.5px dashed rgba(0, 92, 149, 0.25);
+            border-radius: 16px;
+        }}
+
+        [data-testid="stExpander"] {{
+            background: {CARD};
+            border: 1px solid {BORDER};
+            border-radius: 16px;
+            margin-bottom: 0.6rem;
+            box-shadow: 0 14px 32px -28px rgba(0, 92, 149, 0.3);
+            transition: border-color 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+        }}
+        [data-testid="stExpander"]:hover {{ border-color: rgba(0, 92, 149, 0.3); }}
+        [data-testid="stExpander"] summary,
+        [data-testid="stExpander"] details > summary {{
+            font-weight: 600 !important;
+            color: {INK} !important;
+            padding: 0.4rem 0 !important;
+        }}
+
+        [data-testid="stAlert"] {{
             border-radius: 14px;
-            padding: 2.2rem 2rem 1.5rem 2rem;
-            text-align: left;
-            margin-top: 3rem;
+            border: 1px solid {BORDER};
+            padding: 0.85rem 1rem !important;
+        }}
+        hr {{ border-color: {BORDER}; }}
+
+        /* -------------------------------------------------- footer */
+        .footer-card {{
+            background: linear-gradient(160deg, rgba(0, 92, 149, 0.05), rgba(27, 168, 225, 0.05), rgba(130, 195, 66, 0.05));
+            border: 1px solid rgba(0, 92, 149, 0.1);
+            border-radius: 24px;
+            padding: 2.4rem 2.2rem 1.6rem 2.2rem;
+            margin-top: 4rem;
         }}
         .footer-meta {{
             display: grid;
@@ -389,10 +548,10 @@ def inject_css() -> None:
         }}
         .meta-title {{
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.68rem;
+            font-size: 0.65rem;
             text-transform: uppercase;
             letter-spacing: 0.18em;
-            color: {PRIMARY};
+            color: {BLUE};
             margin-bottom: 0.85rem;
             font-weight: 500;
         }}
@@ -401,19 +560,15 @@ def inject_css() -> None:
             justify-content: space-between;
             align-items: baseline;
             padding: 0.4rem 0;
-            border-bottom: 1px solid {BORDER};
+            border-bottom: 1px solid rgba(0, 92, 149, 0.08);
             font-size: 0.9rem;
         }}
         .meta-row:last-child {{ border-bottom: none; }}
-        .meta-key {{
-            color: {MUTED};
-            font-weight: 500;
-        }}
+        .meta-key {{ color: {MUTED}; }}
         .meta-val {{
-            color: {PRIMARY_DARK};
+            color: {INK};
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            font-weight: 500;
+            font-size: 0.82rem;
             text-align: right;
         }}
         .footer-bar {{
@@ -422,309 +577,64 @@ def inject_css() -> None:
             align-items: flex-end;
             gap: 1rem;
             padding-top: 1.25rem;
-            border-top: 1px solid {BORDER};
+            border-top: 1px solid rgba(0, 92, 149, 0.1);
         }}
         @media (max-width: 640px) {{
             .footer-bar {{ flex-direction: column; align-items: flex-start; }}
         }}
-        .avatar {{
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, {PRIMARY} 0%, {PRIMARY_DARK} 100%);
-            color: white;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Manrope', sans-serif;
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-bottom: 0.85rem;
-            box-shadow: 0 4px 14px rgba(31, 165, 219, 0.25);
-            animation: avatarPulse 4s ease-in-out infinite;
-        }}
-        @keyframes avatarPulse {{
-            0%, 100% {{ box-shadow: 0 4px 14px rgba(31, 165, 219, 0.20); }}
-            50% {{ box-shadow: 0 6px 22px rgba(31, 165, 219, 0.42); }}
-        }}
         .footer-name {{
-            font-family: 'Manrope', sans-serif;
-            font-size: 1.05rem;
-            color: {PRIMARY_DARK};
+            font-family: 'Fraunces', serif;
+            font-size: 1.1rem;
+            font-weight: 550;
+            color: {INK};
             margin-bottom: 0.2rem;
-            font-weight: 700;
         }}
-        .footer-bio {{ color: {MUTED}; font-size: 0.82rem; }}
-        .footer-links {{ display: flex; gap: 1.1rem; }}
+        .footer-bio {{ color: {MUTED}; font-size: 0.84rem; }}
+        .footer-links {{ display: flex; gap: 0.5rem; }}
         .footer-links a {{
-            color: {PRIMARY};
+            color: {BLUE};
             text-decoration: none;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: 600;
-            font-family: 'JetBrains Mono', monospace;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
+            padding: 0.4rem 0.9rem;
+            border: 1px solid rgba(0, 92, 149, 0.18);
+            border-radius: 999px;
+            transition: background 0.4s cubic-bezier(0.32, 0.72, 0, 1),
+                        border-color 0.4s cubic-bezier(0.32, 0.72, 0, 1);
         }}
-        .footer-links a:hover {{ text-decoration: underline; }}
+        .footer-links a:hover {{
+            background: rgba(0, 92, 149, 0.07);
+            border-color: rgba(0, 92, 149, 0.4);
+        }}
         .copyright {{
             color: {MUTED};
             font-size: 0.72rem;
             margin-top: 1.25rem;
             padding-top: 1rem;
-            border-top: 1px solid {BORDER};
-            font-family: 'JetBrains Mono', monospace;
-            letter-spacing: 0.04em;
-        }}
-        section[data-testid="stSidebar"] {{ display: none; }}
-        .block-container {{ max-width: 780px; padding-top: 4rem; }}
-
-        .method-card {{
-            background: {CARD};
-            border: 1px solid {BORDER};
-            border-left: 3px solid {ACCENT};
-            border-radius: 10px;
-            padding: 1.25rem 1.35rem;
-            margin-bottom: 1rem;
-            height: 100%;
-            transition: box-shadow 0.18s ease, transform 0.18s ease, border-left-color 0.18s ease;
-        }}
-        .method-card:hover {{
-            box-shadow: 0 6px 18px rgba(27, 54, 93, 0.08);
-            transform: translateY(-2px);
-            border-left-color: {PRIMARY};
-        }}
-        .method-title {{
-            font-family: 'Manrope', sans-serif;
-            font-size: 1rem;
-            color: {PRIMARY_DARK};
-            margin-bottom: 0.5rem;
-            font-weight: 700;
-            letter-spacing: -0.01em;
-        }}
-        .method-body {{
-            font-size: 0.92rem;
-            color: {TEXT_BODY};
-            line-height: 1.6;
-            font-weight: 400;
-        }}
-        .section-note {{
-            color: {MUTED};
-            font-size: 0.92rem;
-            line-height: 1.6;
-            margin: 0.25rem 0 1.5rem 0;
-            max-width: 62ch;
-        }}
-        .cm-label {{
-            font-family: 'Manrope', sans-serif;
-            color: {PRIMARY_DARK};
-            font-size: 0.95rem;
-            text-align: center;
-            margin-bottom: 0.4rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
+            border-top: 1px solid rgba(0, 92, 149, 0.08);
         }}
 
-        /* WDW-style section labels: small mono uppercase before serif title */
-        .sec-num {{
-            display: block;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.72rem;
-            font-weight: 500;
-            color: {PRIMARY};
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            margin: 2.5rem 0 0.6rem 0;
+        /* -------------------------------------------------- motion */
+        /* One system. Entry rise for the hero and nav on load; a scroll-tied
+           rise for everything below the fold. fill-mode backwards keeps
+           elements visible if an animation never fires. */
+        @keyframes riseIn {{
+            from {{ opacity: 0; transform: translateY(18px); }}
+            to {{ opacity: 1; transform: translateY(0); }}
         }}
-        .stApp h3 {{
-            margin-top: 0 !important;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid {BORDER};
-        }}
+        .hero-block {{ animation: riseIn 0.8s cubic-bezier(0.32, 0.72, 0, 1) backwards; }}
+        .top-nav {{ animation: riseIn 0.6s cubic-bezier(0.32, 0.72, 0, 1) backwards; }}
 
-        /* Sticky top nav with glass-blur backdrop */
-        .top-nav {{
-            position: sticky;
-            top: 56px;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 0.4rem;
-            padding: 0.7rem 1rem;
-            margin: -1.5rem -1rem 1.5rem -1rem;
-            background: rgba(255, 255, 255, 0.72);
-            backdrop-filter: blur(18px) saturate(180%);
-            -webkit-backdrop-filter: blur(18px) saturate(180%);
-            border-bottom: 1px solid {BORDER};
-            border-radius: 10px;
-        }}
-        .top-nav .brand {{
-            font-family: 'Fraunces', serif;
-            font-weight: 500;
-            color: {PRIMARY_DARK};
-            font-size: 0.95rem;
-            margin-right: auto;
-            padding-left: 0.3rem;
-        }}
-        .top-nav a {{
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.68rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: {MUTED};
-            text-decoration: none;
-            padding: 0.4rem 0.75rem;
-            border-radius: 999px;
-            transition: color 200ms ease, background 200ms ease;
-            font-weight: 500;
-        }}
-        .top-nav a:hover {{
-            color: {PRIMARY_DARK};
-            background: rgba(31, 165, 219, 0.08);
-        }}
-
-        /* Expander styling: premium tinted card look */
-        [data-testid="stExpander"] {{
-            background: {CARD_TINT};
-            border: 1px solid {BORDER};
-            border-left: 3px solid {ACCENT};
-            border-radius: 10px;
-            margin-bottom: 0.6rem;
-            box-shadow: 0 1px 3px rgba(27, 54, 93, 0.03);
-            transition: box-shadow 0.18s ease, border-left-color 0.18s ease;
-        }}
-        [data-testid="stExpander"]:hover {{
-            box-shadow: 0 4px 12px rgba(27, 54, 93, 0.07);
-            border-left-color: {PRIMARY};
-        }}
-        [data-testid="stExpander"] summary,
-        [data-testid="stExpander"] details > summary {{
-            font-weight: 600 !important;
-            color: {PRIMARY_DARK} !important;
-            padding: 0.4rem 0 !important;
-        }}
-        [data-testid="stExpander"] details[open] {{
-            background: transparent;
-        }}
-
-        /* Radio buttons: chip-style premium */
-        .stRadio > div {{ gap: 0.5rem !important; }}
-        .stRadio label {{
-            background: {CARD};
-            border: 1.5px solid {BORDER};
-            padding: 0.45rem 1rem !important;
-            border-radius: 8px;
-            transition: all 0.18s ease;
-            cursor: pointer;
-        }}
-        .stRadio label:hover {{
-            border-color: {PRIMARY};
-            background: {CARD_TINT};
-            transform: translateY(-1px);
-        }}
-        .stRadio label[data-checked="true"] {{
-            border-color: {PRIMARY};
-            background: {CARD_TINT};
-        }}
-
-        /* Selectbox: subtle premium frame */
-        .stSelectbox [data-baseweb="select"] > div {{
-            border-radius: 8px !important;
-            border-color: {BORDER} !important;
-            background: {CARD} !important;
-            transition: border-color 0.18s ease, box-shadow 0.18s ease;
-        }}
-        .stSelectbox [data-baseweb="select"] > div:hover {{
-            border-color: {PRIMARY} !important;
-        }}
-        .stSelectbox [data-baseweb="select"] > div:focus-within {{
-            border-color: {PRIMARY} !important;
-            box-shadow: 0 0 0 3px rgba(31, 165, 219, 0.12);
-        }}
-
-        /* File uploader */
-        [data-testid="stFileUploader"] section {{
-            background: {CARD_TINT};
-            border: 1.5px dashed {BORDER};
-            border-radius: 10px;
-        }}
-
-        /* Streamlit alert boxes: cleaner */
-        [data-testid="stAlert"] {{
-            border-radius: 10px;
-            border: 1px solid {BORDER};
-            padding: 0.85rem 1rem !important;
-        }}
-
-        /* Custom divider replacement (subtle gradient line) */
-        .gradient-divider {{
-            height: 1px;
-            background: linear-gradient(90deg, transparent 0%, {BORDER} 20%, {BORDER} 80%, transparent 100%);
-            margin: 2rem 0;
-            border: none;
-        }}
-
-        /* Streamlit alerts */
-        [data-testid="stAlert"] {{
-            border-radius: 10px;
-            animation: smoothFade 0.35s ease-out;
-        }}
-
-        /* Smooth fade on plots, images, and prediction renders so switching
-           between samples doesn't snap-cut. No animation-fill-mode set,
-           so default opacity is 1 if animation never fires. */
         @keyframes smoothFade {{
             from {{ opacity: 0; transform: translateY(8px); }}
             to {{ opacity: 1; transform: translateY(0); }}
         }}
-        [data-testid="stPyplotChart"],
-        [data-testid="stPyplotChart"] img,
-        [data-testid="stImage"],
-        [data-testid="stImage"] img {{
-            animation: smoothFade 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }}
-        .pred-reveal {{
-            animation: smoothFade 0.42s cubic-bezier(0.16, 1, 0.3, 1);
-        }}
+        .pred-reveal {{ animation: smoothFade 0.5s cubic-bezier(0.32, 0.72, 0, 1); }}
 
-        /* Entry animations — safe pattern: animation-fill-mode: backwards
-           means elements default to visible if animation fails, only invisible
-           during the delay (which is brief). No catch-all selectors. */
-        @keyframes riseIn {{
-            from {{ opacity: 0; transform: translateY(16px); }}
-            to {{ opacity: 1; transform: translateY(0); }}
-        }}
-        .hero-block {{
-            animation: riseIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-        }}
-        [data-testid="stMetric"] {{
-            animation: riseIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-        }}
-        [data-testid="stMetric"]:nth-of-type(1) {{ animation-delay: 80ms; }}
-        [data-testid="stMetric"]:nth-of-type(2) {{ animation-delay: 130ms; }}
-        [data-testid="stMetric"]:nth-of-type(3) {{ animation-delay: 180ms; }}
-        [data-testid="stMetric"]:nth-of-type(4) {{ animation-delay: 230ms; }}
-        [data-testid="stMetric"]:nth-of-type(5) {{ animation-delay: 280ms; }}
-        [data-testid="stMetric"]:nth-of-type(6) {{ animation-delay: 330ms; }}
-        .method-card {{
-            animation: riseIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-        }}
-        .method-card:nth-of-type(1) {{ animation-delay: 60ms; }}
-        .method-card:nth-of-type(2) {{ animation-delay: 120ms; }}
-        .method-card:nth-of-type(3) {{ animation-delay: 180ms; }}
-        .method-card:nth-of-type(4) {{ animation-delay: 240ms; }}
-        .footer-card {{
-            animation: riseIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-            animation-delay: 100ms;
-        }}
-
-        /* Scroll-triggered reveal for content below the fold. Uses CSS view()
-           timeline (Chrome/Edge 115+, Safari 26+). Older browsers ignore
-           animation-timeline and the animation plays once on load instead —
-           still safe, just not scroll-driven. */
+        /* CSS view() timeline (Chrome/Edge 115+, Safari 26+). Older browsers
+           ignore animation-timeline and play the rise once on load instead. */
         @keyframes scrollRise {{
-            from {{ opacity: 0; transform: translateY(40px); }}
+            from {{ opacity: 0; transform: translateY(36px); }}
             to {{ opacity: 1; transform: translateY(0); }}
         }}
         [data-testid="stPyplotChart"],
@@ -732,27 +642,30 @@ def inject_css() -> None:
         [data-testid="stExpander"],
         .method-card,
         .prose,
-        .pred-reveal {{
+        .footer-card {{
             animation: scrollRise linear both;
             animation-timeline: view();
-            animation-range: entry 0% cover 28%;
+            animation-range: entry 0% cover 26%;
         }}
 
-        /* Card hover lift */
-        [data-testid="stMetric"] {{
-            transition: transform 0.18s ease, box-shadow 0.18s ease;
-        }}
-        [data-testid="stMetric"]:hover {{
-            transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(14, 127, 184, 0.10);
-        }}
-        .footer-card {{
-            transition: box-shadow 0.18s ease;
-        }}
-        .footer-card:hover {{
-            box-shadow: 0 6px 18px rgba(14, 127, 184, 0.08);
+        @media (prefers-reduced-motion: reduce) {{
+            .bezel, .live-dot, .wave-sep svg,
+            .hero-block, .top-nav, .pred-reveal {{ animation: none !important; }}
         }}
 
+        /* Small screens: tighter type, brand-only nav pill. */
+        @media (max-width: 640px) {{
+            .stApp h1 {{ font-size: 2.4rem !important; }}
+            .stApp h3 {{ font-size: 1.5rem !important; }}
+            .top-nav {{ padding: 0.4rem 0.55rem; }}
+            .top-nav a {{ display: none; }}
+            .hero-stat-value {{ font-size: 2.5rem; }}
+            .hero-stats {{ gap: 1.8rem; }}
+            .pred-conf {{ font-size: 2.7rem; }}
+            [data-testid="stMetricValue"] {{ font-size: 2.1rem !important; }}
+            .block-container {{ padding-top: 1.5rem; }}
+            .footer-card {{ padding: 1.6rem 1.3rem 1.2rem 1.3rem; }}
+        }}
         </style>
         """,
         unsafe_allow_html=True,
@@ -800,23 +713,23 @@ def plot_signal(window: np.ndarray) -> plt.Figure:
 def plot_top5(top_probs: np.ndarray, top_names: list[str], correct_idx: int | None) -> plt.Figure:
     with plt.rc_context(PLOT_STYLE):
         fig, ax = plt.subplots(figsize=(7.0, 2.8))
-        colors = [PRIMARY] * len(top_probs)
+        colors = [CHART_BLUE] * len(top_probs)
         if correct_idx is not None:
-            colors[correct_idx] = ACCENT
+            colors[correct_idx] = CHART_GREEN
         ax.barh(range(len(top_probs)), top_probs[::-1], color=colors[::-1], height=0.62)
         ax.set_yticks(range(len(top_probs)))
         ax.set_yticklabels(top_names[::-1])
         ax.set_xlim(0, 1)
         ax.set_xlabel("probability")
         for i, p in enumerate(top_probs[::-1]):
-            ax.text(p + 0.012, i, f"{p:.1%}", va="center", fontsize=9, color=TEXT,
-                    family="JetBrains Mono")
+            ax.text(p + 0.012, i, f"{p:.1%}", va="center", fontsize=9, color=INK,
+                    family="monospace")
         ax.spines["bottom"].set_visible(False)
         ax.tick_params(axis="x", length=0, labelbottom=False)
         ax.tick_params(axis="y", length=0)
         if correct_idx is not None:
-            ax.text(1.0, -0.9, "true label", color=ACCENT, fontsize=8.5,
-                    ha="right", va="center", family="JetBrains Mono")
+            ax.text(1.0, -0.9, "true label", color=CHART_GREEN, fontsize=8.5,
+                    ha="right", va="center", family="monospace")
         fig.tight_layout()
     return fig
 
@@ -841,6 +754,19 @@ def render_nav() -> None:
     st.markdown(
         """
         <div class="top-nav">
+            <span class="brand">
+                <svg width="20" height="14" viewBox="0 0 20 14" aria-hidden="true">
+                    <defs><linearGradient id="wv" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0" stop-color="#005C95"/>
+                        <stop offset="0.55" stop-color="#1BA8E1"/>
+                        <stop offset="1" stop-color="#82C342"/>
+                    </linearGradient></defs>
+                    <path d="M1 7 h3.5 l1.8 -4.5 2.8 9 2 -6.5 1.7 2 h6.2"
+                          fill="none" stroke="url(#wv)" stroke-width="1.8"
+                          stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                EMG Gesture Classifier
+            </span>
             <a href="#classify">Classify</a>
             <a href="#compare">Compare</a>
             <a href="#perclass">Classes</a>
@@ -852,77 +778,74 @@ def render_nav() -> None:
     )
 
 
-def render_hero(comparison: dict, labels: dict) -> None:
+def render_hero(model, stats, labels: dict, comparison: dict) -> None:
     cnn = comparison.get("cnn_1d", {})
-    sample_cls = 5
-    sample_name = labels.get(sample_cls, f"class_{sample_cls}")
-    sample_conf = 64.3
+
+    # Run the model on a real held-out window so the hero card shows an
+    # actual prediction, not a mockup.
+    card_html = ""
+    sample_path = SAMPLES_DIR / "sample_class05.npy"
+    if model is not None and sample_path.exists():
+        window = np.load(sample_path).astype(np.float32)
+        probs = predict(model, window, stats)
+        pred_id = int(probs.argmax())
+        pred_name = labels.get(pred_id, f"class_{pred_id}")
+        conf = probs[pred_id]
+        true_id = true_class_from_filename(sample_path.name)
+        outcome = "correct" if pred_id == true_id else f"true class {true_id}"
+        card_html = f"""
+            <div class="bezel">
+                <div class="bezel-core">
+                    <div class="live-label"><span class="live-dot"></span>Model output · test window</div>
+                    <div class="pred-name">{pred_name}</div>
+                    <div class="pred-conf">{conf:.1%}</div>
+                    <div class="pred-meta"><span>{gesture_group(pred_id)}</span><span>{outcome}</span></div>
+                    <div class="spec-rows">
+                        <div class="spec-row"><span>Architecture</span><span>1D CNN · 60,309 params</span></div>
+                        <div class="spec-row"><span>Test accuracy</span><span>{cnn.get('accuracy', 0):.1%}</span></div>
+                    </div>
+                </div>
+            </div>
+        """
 
     st.markdown(
         f"""
         <div class="hero-block hero-grid">
-            <div class="hero-left">
-                <div class="hero-chip">Machine Learning · Biosignals</div>
-                <h1 style="margin: 0 0 0.7rem 0;">EMG Hand Gesture Classifier</h1>
-                <div style="font-size: 1.05rem; color: {TEXT_BODY}; line-height: 1.55; max-width: 52ch; margin-bottom: 1.5rem;">
-                    A study of 1.2 million surface-EMG windows from 27 subjects, classifying 53 hand gestures with a Random Forest baseline and a 1D CNN.
+            <div>
+                <span class="hero-eyebrow">Surface EMG · NinaPro DB1</span>
+                <h1 style="margin: 0;">Reading gestures<br>from muscle signals</h1>
+                <div class="hero-sub">
+                    1.2 million surface-EMG windows from 27 subjects, classifying
+                    53 hand gestures with a Random Forest baseline and a 1D CNN.
                 </div>
                 <div class="hero-stats">
-                    <div class="hero-stat">
-                        <div class="hero-stat-value">1.2<span class="hero-stat-unit">M</span></div>
-                        <div class="hero-stat-label">Windows trained</div>
+                    <div>
+                        <div class="hero-stat-value">1.2<span class="unit">M</span></div>
+                        <div class="hero-stat-label">Windows</div>
                     </div>
-                    <div class="hero-stat">
+                    <div>
                         <div class="hero-stat-value">27</div>
                         <div class="hero-stat-label">Subjects</div>
                     </div>
-                    <div class="hero-stat">
+                    <div>
                         <div class="hero-stat-value">53</div>
                         <div class="hero-stat-label">Gestures</div>
                     </div>
                 </div>
-                <div class="byline" style="margin: 1.4rem 0 1.2rem 0;">by Johnny Nguyen · UCF Data Science</div>
+                <div class="byline">by Johnny Nguyen · UCF Data Science</div>
                 <a href="{GITHUB_URL}" target="_blank" class="text-link">
                     View source on GitHub <span class="arrow">→</span>
                 </a>
             </div>
-            <div class="hero-side">
-                <div class="side-stack">
-                    <div class="side-card">
-                        <div class="side-card-label"><span class="side-dot"></span>Sample · Preview</div>
-                        <div class="side-card-sub">Predicted gesture for class 5</div>
-                        <div class="side-card-name">{labels.get(5, 'Ring flexion')}</div>
-                        <div class="side-card-confidence">
-                            <span class="side-card-conf-num">64.3</span><span class="side-card-conf-unit">%</span>
-                        </div>
-                        <div class="side-card-meta"><span>CONFIDENCE</span><span>BASIC FINGER MOVEMENT</span></div>
-                    </div>
-                    <div class="side-card">
-                        <div class="side-card-label"><span class="side-dot"></span>Sample · Preview</div>
-                        <div class="side-card-sub">Predicted gesture for class 25</div>
-                        <div class="side-card-name">{labels.get(25, 'Wrist flexion')}</div>
-                        <div class="side-card-confidence">
-                            <span class="side-card-conf-num">16.3</span><span class="side-card-conf-unit">%</span>
-                        </div>
-                        <div class="side-card-meta"><span>CONFIDENCE</span><span>HAND CONFIGURATION</span></div>
-                    </div>
-                    <div class="side-card">
-                        <div class="side-card-label"><span class="side-dot"></span>Sample · Preview</div>
-                        <div class="side-card-sub">Predicted gesture for class 42</div>
-                        <div class="side-card-name">{labels.get(42, 'Tripod grasp')}</div>
-                        <div class="side-card-confidence">
-                            <span class="side-card-conf-num">12.5</span><span class="side-card-conf-unit">%</span>
-                        </div>
-                        <div class="side-card-meta"><span>CONFIDENCE</span><span>FUNCTIONAL GRASP</span></div>
-                    </div>
-                </div>
-                <div class="model-card">
-                    <div class="model-card-label">Model</div>
-                    <div class="model-card-row"><span>Architecture</span><span>1D CNN</span></div>
-                    <div class="model-card-row"><span>Parameters</span><span>60,309</span></div>
-                    <div class="model-card-row"><span>Test accuracy</span><span>{cnn.get('accuracy', 0):.1%}</span></div>
-                </div>
-            </div>
+            <div>{card_html}</div>
+        </div>
+        <div class="wave-sep">
+            <svg viewBox="0 0 1440 54" preserveAspectRatio="none">
+                <path d="M0,30 C240,54 480,4 720,18 C960,32 1200,50 1440,24 L1440,54 L0,54 Z"
+                      fill="rgba(27, 168, 225, 0.12)"/>
+                <path d="M0,40 C280,58 520,14 760,26 C1000,38 1240,54 1440,34 L1440,54 L0,54 Z"
+                      fill="rgba(130, 195, 66, 0.1)"/>
+            </svg>
         </div>
         """,
         unsafe_allow_html=True,
@@ -930,7 +853,7 @@ def render_hero(comparison: dict, labels: dict) -> None:
 
 
 def render_demo(model, stats, labels) -> None:
-    st.markdown('<span class="sec-num" id="classify">§ 01 — Try the model</span><h3>Live Classification</h3>', unsafe_allow_html=True)
+    st.markdown('<span class="sec-num" id="classify">§ 01 — Try the model</span><h3>Live classification</h3>', unsafe_allow_html=True)
     samples = sorted(SAMPLES_DIR.glob("*.npy")) if SAMPLES_DIR.exists() else []
 
     source = st.radio(
@@ -979,22 +902,20 @@ def render_demo(model, stats, labels) -> None:
 
     sig_col, pred_col = st.columns([1.6, 1], gap="large")
     with sig_col:
-        st.markdown(f'<div style="color:{MUTED}; font-size: 0.75rem; '
-                    f'text-transform: uppercase; letter-spacing: 0.08em; '
-                    f'font-weight: 500;">Signal trace</div>',
+        st.markdown(f'<div style="color:{MUTED}; font-size: 0.72rem; '
+                    f'text-transform: uppercase; letter-spacing: 0.1em; '
+                    f'font-weight: 600;">Signal trace</div>',
                     unsafe_allow_html=True)
         st.pyplot(plot_signal(window), use_container_width=True)
     with pred_col:
         st.markdown(
             f'<div class="pred-reveal">'
-            f'<div style="color:{MUTED}; font-size: 0.75rem; '
-            f'text-transform: uppercase; letter-spacing: 0.08em; '
+            f'<div style="color:{MUTED}; font-size: 0.72rem; '
+            f'text-transform: uppercase; letter-spacing: 0.1em; '
             f'font-weight: 600; margin-bottom: 0.4rem;">Prediction</div>'
-            f'<div style="font-family: \'Manrope\', sans-serif; font-size: 1.5rem; '
-            f'font-weight: 700; color: {PRIMARY_DARK}; line-height: 1.15; '
-            f'margin-bottom: 0.5rem; letter-spacing: -0.01em;">{pred_name}</div>'
+            f'<div class="pred-name">{pred_name}</div>'
             f'<div style="font-family: \'JetBrains Mono\', monospace; '
-            f'font-size: 1.1rem; color: {PRIMARY}; margin-bottom: 0.25rem;">'
+            f'font-size: 1.1rem; color: {BLUE}; margin-bottom: 0.35rem;">'
             f'{top_probs[0]:.1%} confidence</div>'
             f'<div class="small-muted">group · {gesture_group(pred_id)}<br>'
             f'class id · {pred_id}</div>'
@@ -1019,28 +940,28 @@ def render_demo(model, stats, labels) -> None:
                 )
 
     st.markdown("&nbsp;", unsafe_allow_html=True)
-    st.markdown('<span class="sec-num">§ 02 — Ranked confidence</span><h3>Top 5 Predictions</h3>', unsafe_allow_html=True)
+    st.markdown('<span class="sec-num">§ 02 — Ranked confidence</span><h3>Top 5 predictions</h3>', unsafe_allow_html=True)
     correct_pos = None
     if true_id is not None and true_id in top_idx.tolist():
         correct_pos = top_idx.tolist().index(true_id)
     st.pyplot(plot_top5(top_probs, top_names, correct_pos), use_container_width=True)
 
 
-def plot_per_class(rows: list[dict], color: str) -> plt.Figure:
+def plot_per_class(rows: list[dict]) -> plt.Figure:
     """Horizontal F1 bars for a small set of gestures."""
     with plt.rc_context(PLOT_STYLE):
         fig, ax = plt.subplots(figsize=(4.6, 4.0))
         names = [r["name"] if len(r["name"]) <= 28 else r["name"][:26] + "…"
                  for r in rows[::-1]]
         f1s = [r["f1"] for r in rows[::-1]]
-        ax.barh(range(len(rows)), f1s, color=color, height=0.62)
+        ax.barh(range(len(rows)), f1s, color=CHART_BLUE, height=0.62)
         ax.set_yticks(range(len(rows)))
         ax.set_yticklabels(names, fontsize=8.5)
         ax.set_xlim(0, 1)
         ax.set_xlabel("F1")
         for i, f in enumerate(f1s):
             ax.text(f + 0.012, i, f"{f:.2f}", va="center", fontsize=8,
-                    color=TEXT, family="JetBrains Mono")
+                    color=INK, family="monospace")
         ax.spines["bottom"].set_visible(False)
         ax.tick_params(axis="x", length=0, labelbottom=False)
         ax.tick_params(axis="y", length=0)
@@ -1049,7 +970,7 @@ def plot_per_class(rows: list[dict], color: str) -> plt.Figure:
 
 
 def render_model_comparison(comparison: dict) -> None:
-    st.markdown('<span class="sec-num" id="compare">§ 03 — Head to head</span><h3>Model Comparison</h3>', unsafe_allow_html=True)
+    st.markdown('<span class="sec-num" id="compare">§ 03 — Head to head</span><h3>Model comparison</h3>', unsafe_allow_html=True)
     st.markdown(
         '<div class="section-note">Random Forest on Hudgins time-domain '
         "features against a 1D CNN trained end to end on the same windows. "
@@ -1115,7 +1036,7 @@ def render_per_class(labels: dict) -> None:
     bottom = rows[:10]
     top = rows[-10:][::-1]
 
-    st.markdown('<span class="sec-num" id="perclass">§ 04 — Where the model breaks</span><h3>Per-Class Performance</h3>', unsafe_allow_html=True)
+    st.markdown('<span class="sec-num" id="perclass">§ 04 — Where the model breaks</span><h3>Per-class performance</h3>', unsafe_allow_html=True)
     st.markdown(
         '<div class="section-note">CNN F1 score per gesture on the held-out '
         "test set. Hardest classes cluster in functional grasps where "
@@ -1128,11 +1049,11 @@ def render_per_class(labels: dict) -> None:
     with c1:
         st.markdown('<div class="cm-label">Hardest 10 classes</div>',
                     unsafe_allow_html=True)
-        st.pyplot(plot_per_class(bottom, PRIMARY), use_container_width=True)
+        st.pyplot(plot_per_class(bottom), use_container_width=True)
     with c2:
         st.markdown('<div class="cm-label">Easiest 10 classes</div>',
                     unsafe_allow_html=True)
-        st.pyplot(plot_per_class(top, ACCENT), use_container_width=True)
+        st.pyplot(plot_per_class(top), use_container_width=True)
 
 
 def render_methodology() -> None:
@@ -1143,20 +1064,20 @@ def render_methodology() -> None:
     )
 
     cards = [
-        ("1 · Preprocess",
+        ("Preprocess",
          "Load 27 subjects from NinaPro DB1 (10 channels, 100 Hz, Otto Bock "
          "electrodes that hardware-rectify the signal). Slide 200 ms windows "
          "with 100 ms overlap. Drop any window crossing a gesture boundary so "
          "the labels stay clean."),
-        ("2 · Features (RF only)",
+        ("Features (RF only)",
          "Hudgins time-domain set per channel: mean absolute value, zero "
          "crossings, slope sign changes, waveform length, RMS, variance. "
          "Six features × ten channels = sixty per window."),
-        ("3 · Model",
+        ("Model",
          "1D CNN: three Conv1D blocks (32 → 64 → 128 channels, kernel 5) with "
          "batchnorm and ReLU, max-pool between them, adaptive average pool, "
          "dropout 0.3, linear head to 53 classes. About 60k parameters total."),
-        ("4 · Train",
+        ("Train",
          "Split by repetition (1–7 train, 8 val, 9–10 test) so the model "
          "never sees windows from a repetition it was trained on. Adam at "
          "lr 2e-3, batch 512, cross-entropy loss, early stopping on val "
@@ -1168,6 +1089,7 @@ def render_methodology() -> None:
         with cols[i % 2]:
             st.markdown(
                 f'<div class="method-card">'
+                f'<div class="method-num">{i + 1:02d}</div>'
                 f'<div class="method-title">{title}</div>'
                 f'<div class="method-body">{body}</div>'
                 f'</div>',
@@ -1281,12 +1203,10 @@ def render_footer(comparison: dict) -> None:
     )
 
 
-
-
 def main() -> None:
     st.set_page_config(
         page_title="EMG Hand Gesture Classifier",
-        page_icon=None,
+        page_icon=str(ROOT / "streamlit_app" / "assets" / "favicon.png"),
         layout="centered",
         initial_sidebar_state="collapsed",
     )
@@ -1301,8 +1221,7 @@ def main() -> None:
         st.stop()
 
     render_nav()
-    render_hero(comparison, labels)
-    st.markdown("&nbsp;", unsafe_allow_html=True)
+    render_hero(model, stats, labels, comparison)
     render_demo(model, stats, labels)
     st.markdown("&nbsp;", unsafe_allow_html=True)
     render_model_comparison(comparison)
