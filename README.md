@@ -11,7 +11,7 @@ Trained on all 27 subjects, 1.2M windows, repetition-based split (reps 1–7 tra
 | Model | Test accuracy | Macro F1 |
 |---|---|---|
 | Random Forest (Hudgins TD features) | **0.531** | 0.527 |
-| 1D CNN (~60k params) | 0.352 | 0.348 |
+| 1D CNN (~60k params) | 0.353 | 0.351 |
 
 The RF beat the CNN by 18 points. The Streamlit demo walks through why.
 
