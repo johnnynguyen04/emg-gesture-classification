@@ -803,6 +803,7 @@ def render_hero(model, stats, labels: dict, comparison: dict) -> None:
                     <div class="spec-rows">
                         <div class="spec-row"><span>Architecture</span><span>1D CNN · 60,309 params</span></div>
                         <div class="spec-row"><span>Test accuracy</span><span>{cnn.get('accuracy', 0):.1%}</span></div>
+                        <div class="spec-row"><span>Chance baseline</span><span>≈ 2%</span></div>
                     </div>
                 </div>
             </div>
@@ -815,17 +816,19 @@ def render_hero(model, stats, labels: dict, comparison: dict) -> None:
                 <span class="hero-eyebrow">Surface EMG · NinaPro DB1</span>
                 <h1 style="margin: 0;">Reading gestures<br>from muscle signals</h1>
                 <div class="hero-sub">
-                    1.2 million surface-EMG windows from 27 subjects, classifying
-                    53 hand gestures with a Random Forest baseline and a 1D CNN.
+                    1.2 million surface-EMG windows from 27 subjects — the same
+                    signal problem an EMG-driven prosthetic has to solve. The
+                    honest result: a Random Forest baseline beat my 1D CNN by
+                    18 points, and this page walks through why.
                 </div>
                 <div class="hero-stats">
                     <div>
-                        <div class="hero-stat-value">1.2<span class="unit">M</span></div>
-                        <div class="hero-stat-label">Windows</div>
+                        <div class="hero-stat-value">53.1<span class="unit">%</span></div>
+                        <div class="hero-stat-label">Best test accuracy</div>
                     </div>
                     <div>
-                        <div class="hero-stat-value">27</div>
-                        <div class="hero-stat-label">Subjects</div>
+                        <div class="hero-stat-value">~2<span class="unit">%</span></div>
+                        <div class="hero-stat-label">Chance baseline</div>
                     </div>
                     <div>
                         <div class="hero-stat-value">53</div>
@@ -939,8 +942,12 @@ def render_demo(model, stats, labels) -> None:
                     f"{probs[true_id]:.1%}, not in top 5."
                 )
 
-    st.markdown("&nbsp;", unsafe_allow_html=True)
-    st.markdown('<span class="sec-num">§ 02 — Ranked confidence</span><h3>Top 5 predictions</h3>', unsafe_allow_html=True)
+    st.markdown(
+        f'<div style="color:{MUTED}; font-size: 0.72rem; text-transform: uppercase; '
+        f'letter-spacing: 0.1em; font-weight: 600; margin-top: 1.5rem;">'
+        f'Top 5 · ranked confidence</div>',
+        unsafe_allow_html=True,
+    )
     correct_pos = None
     if true_id is not None and true_id in top_idx.tolist():
         correct_pos = top_idx.tolist().index(true_id)
@@ -970,12 +977,13 @@ def plot_per_class(rows: list[dict]) -> plt.Figure:
 
 
 def render_model_comparison(comparison: dict) -> None:
-    st.markdown('<span class="sec-num" id="compare">§ 03 — Head to head</span><h3>Model comparison</h3>', unsafe_allow_html=True)
+    st.markdown('<span class="sec-num" id="compare">§ 02 — Head to head</span><h3>Model comparison</h3>', unsafe_allow_html=True)
     st.markdown(
-        '<div class="section-note">Random Forest on Hudgins time-domain '
-        "features against a 1D CNN trained end to end on the same windows. "
-        "Identical train/val/test split, no augmentation on either side, so "
-        "the gap between them is honest."
+        '<div class="section-note">With 53 roughly balanced classes, guessing '
+        "gets you about 2% — keep that in mind reading these numbers. Random "
+        "Forest on Hudgins time-domain features against a 1D CNN trained end "
+        "to end on the same windows. Identical train/val/test split, no "
+        "augmentation on either side, so the gap between them is honest."
         "</div>",
         unsafe_allow_html=True,
     )
@@ -1036,7 +1044,7 @@ def render_per_class(labels: dict) -> None:
     bottom = rows[:10]
     top = rows[-10:][::-1]
 
-    st.markdown('<span class="sec-num" id="perclass">§ 04 — Where the model breaks</span><h3>Per-class performance</h3>', unsafe_allow_html=True)
+    st.markdown('<span class="sec-num" id="perclass">§ 03 — Where the model breaks</span><h3>Per-class performance</h3>', unsafe_allow_html=True)
     st.markdown(
         '<div class="section-note">CNN F1 score per gesture on the held-out '
         "test set. Hardest classes cluster in functional grasps where "
@@ -1057,7 +1065,7 @@ def render_per_class(labels: dict) -> None:
 
 
 def render_methodology() -> None:
-    st.markdown('<span class="sec-num" id="method">§ 05 — How it works</span><h3>Methodology</h3>', unsafe_allow_html=True)
+    st.markdown('<span class="sec-num" id="method">§ 04 — How it works</span><h3>Methodology</h3>', unsafe_allow_html=True)
     st.markdown(
         '<div class="section-note">How this was built, four steps.</div>',
         unsafe_allow_html=True,
@@ -1098,6 +1106,19 @@ def render_methodology() -> None:
 
 
 def render_expanders(labels: dict) -> None:
+    with st.expander("How to read these charts"):
+        st.markdown(
+            "- **Signal trace**: ten lines, one per forearm electrode, stacked "
+            "vertically. NinaPro DB1 uses Otto Bock electrodes that rectify and "
+            "smooth the signal in hardware, so it looks calmer than raw EMG.\n"
+            "- **Prediction**: the gesture the model is betting on, with its "
+            "confidence and which group it belongs to. With 53 classes, "
+            "anything well above 2% means the model has real signal.\n"
+            "- **Top 5**: the model's five most likely guesses with probability. "
+            "Low max probability means the model knows it is unsure. The green "
+            "bar marks the true label when it is in the top 5."
+        )
+
     with st.expander("What are the 53 gestures?"):
         groups = [
             ("Rest (class 0)", [0]),
@@ -1109,21 +1130,9 @@ def render_expanders(labels: dict) -> None:
             st.markdown(f"**{title}**")
             st.markdown("\n".join(f"- `{i}` · {labels.get(i, '?')}" for i in ids))
 
-    with st.expander("How to read this page"):
-        st.markdown(
-            "- **Signal trace**: ten lines, one per forearm electrode, stacked "
-            "vertically. NinaPro DB1 uses Otto Bock electrodes that rectify and "
-            "smooth the signal in hardware, so it looks calmer than raw EMG.\n"
-            "- **Prediction**: the gesture the model is betting on, with its "
-            "confidence and which group it belongs to.\n"
-            "- **Top 5**: the model's five most likely guesses with probability. "
-            "Low max probability means the model knows it is unsure. The green "
-            "bar marks the true label when it is in the top 5."
-        )
-
 
 def render_why() -> None:
-    st.markdown('<span class="sec-num" id="why">§ 06 — Context</span><h3>Why I built this</h3>', unsafe_allow_html=True)
+    st.markdown('<span class="sec-num" id="why">§ 05 — Context</span><h3>Why I built this</h3>', unsafe_allow_html=True)
     st.markdown(
         '<div class="prose">'
         "I wanted to take a biosignal project end to end: load raw EMG, "
@@ -1223,14 +1232,13 @@ def main() -> None:
     render_nav()
     render_hero(model, stats, labels, comparison)
     render_demo(model, stats, labels)
+    render_expanders(labels)
     st.markdown("&nbsp;", unsafe_allow_html=True)
     render_model_comparison(comparison)
     st.markdown("&nbsp;", unsafe_allow_html=True)
     render_per_class(labels)
     st.markdown("&nbsp;", unsafe_allow_html=True)
     render_methodology()
-    st.markdown("&nbsp;", unsafe_allow_html=True)
-    render_expanders(labels)
     st.markdown("&nbsp;", unsafe_allow_html=True)
     render_why()
     render_footer(comparison)
